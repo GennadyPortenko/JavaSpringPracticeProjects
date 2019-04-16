@@ -1,0 +1,12 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Hello</title>
+</head>
+<body>
+hello, <span th:text="${param.firstName}"></span>  <span th:text="${param.lastName}"></span>
+hello, [[${param.firstName}]]  <span th:text="${param.lastName}"></span>
+</body>
+</html>

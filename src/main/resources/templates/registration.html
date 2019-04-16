@@ -1,0 +1,36 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.css}">
+    <script th:src="@{/vendor/jquery/js/jquery.min.js}"></script>
+    <script th:src="@{/vendor/bootstrap/js/bootstrap.min.js}"></script>
+    <script th:src="@{/vendor/bootstrap/js/validator.min.js}"></script>
+</head>
+<body>
+<div th:replace="/include/header :: header"></div>
+  <div class ="container">
+      <div class="login-form">
+          <form action="#" th:action="@{/registered}" th:object="${user}" method="post"    data-toggle="validator" role="form"  >
+              <div class="login-form-title">Создание учетной записи</div>
+              <div class="form-group"><input th:field="*{login}" class="login-form-input" id="form-login" required placeholder="Логин" name="login"></div>
+              <div class="form-group"><input th:field="*{email}" class="login-form-input" id="form-email" required placeholder="email" name="email"></div>
+              <div class="form-group">
+                  <input th:field="*{password}" class="login-form-input" id="form-password" type="password"
+                         required placeholder="Пароль" name="passwd">
+              </div>
+              <div class="form-group">
+                  <input class="login-form-input" id="form-password-confirm" type="password" data-match="#form-password"
+                         data-match-error="Пароли не совпадают" required placeholder="Подтвердите пароль" name="passwd_confirm">
+                  <div class="help-block with-errors"></div>
+              </div>
+              <p> <input type="submit" class="login-form-submit" value="Зарегистрироваться"> </p>
+          </form>
+      </div>
+
+  </div>
+</body>
+</html>

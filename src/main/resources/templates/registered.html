@@ -1,0 +1,22 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Регистрация прошла успешно</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.css}">
+</head>
+<body>
+  <div th:replace="/include/header :: header"></div>
+  <div class ="container">
+      <div th:switch="${registered_f}" class="msg">
+          <div th:case="true">Поздравляем! Вы зарегистрированы, как [[${user.login}]]</div>
+          <div th:case="false">
+            <div th:text="${error_msg}" class="msg error-msg"></div>
+            <div class="msg">Пожалуйста, попробуйте <a th:href="@{registration}">еще раз</a></div>
+          </div>
+      </div>
+  </div>
+</body>
+</html>
