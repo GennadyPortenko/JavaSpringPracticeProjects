@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 @Controller
 public class LoginController {
@@ -32,7 +34,13 @@ public class LoginController {
     }
 
     @RequestMapping(value="/registered", method = RequestMethod.POST)
-    public ModelAndView register(User user, ModelMap modelMap) {
+    public ModelAndView register(@Valid User user, BindingResult bindingResult,  ModelMap modelMap) {
+        ModelAndView modelAndView = new ModelAndView("registered");
+        if (bindingResult.hasErrors()) {
+            modelMap.put("registered_f", false);
+            modelMap.put("error_msg", "Ошибка регистрации. Пожалуйста, проверьте правильность заполения полей.");
+            return modelAndView;
+        }
         try {
             User userFoundByLogin = userService.findByLogin(user.getLogin());
             User userFoundByEmail = userService.findByEmail(user.getEmail());
@@ -49,9 +57,8 @@ public class LoginController {
         } catch (Exception /* NonUniqueResultException */ e) {
             modelMap.put("registered_f", false);
             modelMap.put("error_msg", "Ошибка регистрации. Попробуйте другую комбинацию логина и пароля");
-            return new ModelAndView("registered");
         }
-        return new ModelAndView("registered");
+        return modelAndView;
     }
 
     @RequestMapping(value="/login", method = RequestMethod.GET)
