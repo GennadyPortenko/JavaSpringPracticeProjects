@@ -9,8 +9,8 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value="/registration", method = RequestMethod.GET)
+    @GetMapping(value="/registration")
     public ModelAndView registration() {
         ModelAndView modelAndView = new ModelAndView();
         User user = new User();
@@ -33,12 +33,12 @@ public class LoginController {
         return modelAndView;
     }
 
-    @RequestMapping(value="/registered", method = RequestMethod.POST)
+    @PostMapping(value="/registered")
     public ModelAndView register(@Valid User user, BindingResult bindingResult,  ModelMap modelMap) {
         ModelAndView modelAndView = new ModelAndView("registered");
         if (bindingResult.hasErrors()) {
             modelMap.put("registered_f", false);
-            modelMap.put("error_msg", "Ошибка регистрации. Пожалуйста, проверьте правильность заполения полей.");
+            modelMap.put("error_msg", "Ошибка регистрации. Пожалуйста, проверьте правильность заполнения полей.");
             return modelAndView;
         }
         try {
@@ -52,7 +52,7 @@ public class LoginController {
                 modelMap.put("error_msg", "Пользователь с таким email уже существует");
             } else {
                 modelMap.put("registered_f", true);
-                userService.saveUser(user);
+                userService.registerNewUserAccount(user);
             }
         } catch (Exception /* NonUniqueResultException */ e) {
             modelMap.put("registered_f", false);
@@ -61,7 +61,7 @@ public class LoginController {
         return modelAndView;
     }
 
-    @RequestMapping(value="/login", method = RequestMethod.GET)
+    @GetMapping(value="/login")
     public ModelAndView logIn() {
         ModelAndView modelAndView = new ModelAndView();
         User user = new User();
@@ -70,7 +70,7 @@ public class LoginController {
         return modelAndView;
     }
 
-    @RequestMapping(value="/login", method = RequestMethod.POST)
+    @PostMapping(value="/login")
     public ModelAndView checkIfLoggedIn(User user, ModelMap modelMap, HttpServletRequest request) {
         HttpSession session = request.getSession();
         ModelAndView modelAndView = new ModelAndView();
@@ -107,7 +107,7 @@ public class LoginController {
         return modelAndView;
     }
 
-    @RequestMapping(value="/logout", method = RequestMethod.GET)
+    @GetMapping(value="/logout")
     public String logoutPage (HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null){

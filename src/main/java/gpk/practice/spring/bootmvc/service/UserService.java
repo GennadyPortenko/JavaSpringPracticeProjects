@@ -12,8 +12,9 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-    public void saveUser(User user) {
+    public User registerNewUserAccount(User user) throws Exception {
         userRepository.save(user);
+        return user;
     }
     public User findByLogin(String login) {
         return userRepository.findByLogin(login);
