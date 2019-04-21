@@ -4,8 +4,8 @@ import gpk.practice.spring.bootmvc.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository("userRepository")
+@Repository()
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findByLogin(String login);
+    User findByUsername(String username);
     User findByEmail(String email);
 }

@@ -14,21 +14,25 @@
 <div th:replace="/include/header :: header"></div>
   <div class ="container">
       <div class="login-form">
-          <form action="#" th:action="@{/registered}" th:object="${user}" method="post"    data-toggle="validator" role="form"  >
-              <div class="login-form-title">Создание учетной записи</div>
-              <div class="form-group"><input th:field="*{login}" class="login-form-input" id="form-login" required placeholder="Логин" name="login"></div>
-              <div class="form-group"><input th:field="*{email}" class="login-form-input" id="form-email" required placeholder="email" name="email"></div>
-              <div class="form-group">
+          <span class="login-form__console-styled-border">-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=</span>
+            <form action="#" th:action="@{/register}" th:object="${user}" method="post" data-toggle="validator" required="true" role="form"  >
+              <div class="login-form-content">
+                <div class="login-form-title">Регистрация</div>
+                <div class="form-group"><input th:field="*{username}" class="login-form-input" id="form-login" required placeholder="Логин" name="login"></div>
+                <div class="form-group"><input th:field="*{email}" class="login-form-input" id="form-email" required placeholder="email" name="email"></div>
+                <div class="form-group">
                   <input th:field="*{password}" class="login-form-input" id="form-password" type="password"
                          required placeholder="Пароль" name="passwd">
-              </div>
-              <div class="form-group">
+                </div>
+                <div class="form-group">
                   <input class="login-form-input" id="form-password-confirm" type="password" data-match="#form-password"
                          data-match-error="Пароли не совпадают" required placeholder="Подтвердите пароль" name="passwd_confirm">
-                  <div class="help-block with-errors"></div> <!-- (Bootstrap tag) -->
+                    <div class="help-block with-errors"></div> <!-- (Bootstrap tag) -->
+                </div>
+                <input type="submit" class="login-form-submit" value="[З]арегистрироваться">
               </div>
-              <p> <input type="submit" class="login-form-submit" value="Зарегистрироваться"> </p>
-          </form>
+            </form>
+          <span class="login-form__console-styled-border">-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=</span>
       </div>
 
   </div>

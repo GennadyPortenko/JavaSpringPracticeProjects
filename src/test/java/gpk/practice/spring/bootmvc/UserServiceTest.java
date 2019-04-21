@@ -1,6 +1,7 @@
 package gpk.practice.spring.bootmvc;
 
 import gpk.practice.spring.bootmvc.model.User;
+import gpk.practice.spring.bootmvc.repository.RoleRepository;
 import gpk.practice.spring.bootmvc.repository.UserRepository;
 import gpk.practice.spring.bootmvc.service.UserService;
 import org.junit.Before;
@@ -21,17 +22,19 @@ public class UserServiceTest {
 
 	@Mock
 	UserRepository mockUserRepository;
+	@Mock
+	RoleRepository mockRoleRepository;
 
 	private UserService userService;
 	private User user;
 
 	@Before
 	public void init() {
-        userService = new UserService(mockUserRepository);
+        userService = new UserService(mockUserRepository, mockRoleRepository);
 
 		user = new User();
 		user.setEmail("john@mail.com");
-		user.setLogin("John");
+		user.setUsername("John");
 
 		when(mockUserRepository.findByEmail(anyString())).thenReturn(user);
 	}

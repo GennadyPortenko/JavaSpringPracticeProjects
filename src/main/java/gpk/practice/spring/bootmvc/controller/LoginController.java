@@ -1,6 +1,7 @@
 package gpk.practice.spring.bootmvc.controller;
 
 import gpk.practice.spring.bootmvc.model.User;
+import gpk.practice.spring.bootmvc.service.SecurityService;
 import gpk.practice.spring.bootmvc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -15,34 +16,35 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @Controller
 public class LoginController {
-
     @Autowired
     private UserService userService;
+    @Autowired
+    SecurityService securityService;
 
     @GetMapping(value="/registration")
-    public ModelAndView registration() {
-        ModelAndView modelAndView = new ModelAndView();
+    public ModelAndView registration(ModelMap modelMap) {
+        ModelAndView modelAndView = new ModelAndView("registration");
+        modelMap.put("username", securityService.getCurrentUserName());
         User user = new User();
         modelAndView.addObject("user", user);
-        modelAndView.setViewName("registration");
         return modelAndView;
     }
 
-    @PostMapping(value="/registered")
+    @PostMapping(value="/register")
     public ModelAndView register(@Valid User user, BindingResult bindingResult,  ModelMap modelMap) {
-        ModelAndView modelAndView = new ModelAndView("registered");
+        ModelAndView modelAndView = new ModelAndView("register");
+        modelMap.put("username", securityService.getCurrentUserName());
         if (bindingResult.hasErrors()) {
             modelMap.put("registered_f", false);
             modelMap.put("error_msg", "Ошибка регистрации. Пожалуйста, проверьте правильность заполнения полей.");
             return modelAndView;
         }
         try {
-            User userFoundByLogin = userService.findByLogin(user.getLogin());
+            User userFoundByLogin = userService.findByLogin(user.getUsername());
             User userFoundByEmail = userService.findByEmail(user.getEmail());
             if ( userFoundByLogin != null ) {
                 modelMap.put("registered_f", false);
@@ -56,54 +58,23 @@ public class LoginController {
             }
         } catch (Exception /* NonUniqueResultException */ e) {
             modelMap.put("registered_f", false);
-            modelMap.put("error_msg", "Ошибка регистрации. Попробуйте другую комбинацию логина и пароля");
+            modelMap.put("error_msg", "Ошибка регистрации.");
         }
         return modelAndView;
+    }
+
+    @GetMapping(value="/access-denied")
+    public String accesDenied(ModelMap modelMap) {
+        modelMap.put("username", securityService.getCurrentUserName());
+        return "access-denied";
     }
 
     @GetMapping(value="/login")
-    public ModelAndView logIn() {
-        ModelAndView modelAndView = new ModelAndView();
+    public ModelAndView logIn(ModelMap modelMap) {
+        ModelAndView modelAndView = new ModelAndView("login");
+        modelMap.put("username", securityService.getCurrentUserName());
         User user = new User();
         modelAndView.addObject("user", user);
-        modelAndView.setViewName("login");
-        return modelAndView;
-    }
-
-    @PostMapping(value="/login")
-    public ModelAndView checkIfLoggedIn(User user, ModelMap modelMap, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        ModelAndView modelAndView = new ModelAndView();
-        try {
-          User userFoundByLogin = userService.findByLogin(user.getLogin());
-          User userFoundByEmail = userService.findByEmail(user.getLogin());
-
-          User userFound = null;
-          if (userFoundByEmail != null) {
-              userFound = userFoundByEmail;
-          } else if (userFoundByLogin != null) {
-              userFound = userFoundByLogin;
-          } else {
-              modelMap.put("logged_f", false);
-              // modelMap.put("error_msg", "Пользователя с такими логином/паролем не существует");
-              modelMap.put("error_msg", "Ошибка авторизации");
-              modelAndView.setViewName("login-error");
-          }
-          if ( userFound.getPassword().equals(user.getPassword()) ) {
-              modelMap.put("logged_f", true);
-              session.setAttribute("userLogin", userFound.getLogin());
-              modelAndView.setViewName("redirect:/");
-          } else {
-              modelMap.put("logged_f", false);
-              modelMap.put("error_msg", "Неверный пароль");
-              modelAndView.setViewName("login-error");
-          }
-        } catch (Exception /* NonUniqueResultException */ e) {
-            modelMap.put("logged_f", false);
-            modelMap.put("error_msg", "Ошибка авторизации");
-            modelAndView.setViewName("login-error");
-            return modelAndView;
-        }
         return modelAndView;
     }
 
@@ -115,5 +86,6 @@ public class LoginController {
         }
         return "redirect:/";
     }
+
 
 }

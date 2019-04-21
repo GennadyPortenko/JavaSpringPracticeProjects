@@ -3,15 +3,17 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>Регистрация прошла успешно</title>
+    <title>Главная</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.css}">
 </head>
 <body>
   <div th:replace="/include/header :: header"></div>
-  <div class ="container">
-      <div th:text="${error_msg}" class="error-msg"></div>
-      <div>Пожалуйста, попробуйте <a th:href="@{login}">еще раз</a> или обратитесь в службу поддержки</div>
+  <div class="container">
+      <div class="error404-msg">
+          <span>Д</span>оступ запрещен<span>!</span>.
+          <p><span>П</span>ожалуйста, войдите в качестве администратора.</p>
+      </div>
   </div>
 </body>
 </html>

@@ -9,5 +9,34 @@
 </head>
 <body>
   <div th:replace="/include/header :: header"></div>
+  <script>
+  function display(data) {
+    console.log("data" + JSON.stringify(data, null, 4));
+  }
+     var search = {}
+		search["username"] = "john";
+		search["email"] = "john@john.com";
+     console.log(${home});
+     $.ajax({
+			type : "POST",
+			contentType : "application/json",
+			url : "${home}ajaxtest",
+			data : JSON.stringify(search),
+			dataType : 'json',
+			timeout : 100000,
+			success : function(data) {
+				console.log("SUCCESS: ", data);
+				display(data);
+			},
+			error : function(e) {
+				console.log("ERROR: ", e);
+				display(e);
+			},
+			done : function(e) {
+				console.log("DONE");
+				enableSearchButton(true);
+			}
+		});
+  </script>
 </body>
 </html>

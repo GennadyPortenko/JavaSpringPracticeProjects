@@ -10,11 +10,11 @@
 <body>
   <div th:replace="/include/header :: header"></div>
   <div class ="container">
-      <div th:switch="${registered_f}" class="msg">
-          <div th:case="true">Поздравляем! Вы зарегистрированы, как [[${user.login}]]</div>
+      <div th:switch="${registered_f}">
+          <div th:case="true" class="main__msg">Поздравляем! Вы зарегистрированы, как [[${user.username}]]!</div>
           <div th:case="false">
-            <div th:text="${error_msg}" class="msg error-msg"></div>
-            <div class="msg">Пожалуйста, попробуйте <a th:href="@{registration}">еще раз</a></div>
+            <div th:text="${error_msg}" class="main__msg error-msg"></div>
+            <div class="main__msg">Пожалуйста, попробуйте <a th:href="@{registration}">еще раз</a></div>
           </div>
       </div>
   </div>
