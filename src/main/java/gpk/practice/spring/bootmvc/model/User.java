@@ -11,7 +11,7 @@ import java.util.Set;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name="user")
+@Table
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     @Id
@@ -20,15 +20,12 @@ public class User {
     int id;
     @NotEmpty
     @Email
-    @Column(name="email")
     String email;
     @NotEmpty
     @Column(name="name")
     String username;
     @NotEmpty
-    @Column(name="password")
     String password;
-    @Column(name="active")
     int active;
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))

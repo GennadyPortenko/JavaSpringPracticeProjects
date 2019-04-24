@@ -1,8 +1,11 @@
 package gpk.practice.spring.bootmvc.controller;
 
+import gpk.practice.spring.bootmvc.dto.UserDto;
 import gpk.practice.spring.bootmvc.model.User;
+import gpk.practice.spring.bootmvc.service.DtoService;
 import gpk.practice.spring.bootmvc.service.SecurityService;
 import gpk.practice.spring.bootmvc.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,23 +22,24 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @Controller
+@RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class LoginController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private SecurityService securityService;
+    private final UserService userService;
+    private final SecurityService securityService;
+    private final DtoService dtoService;
 
     @GetMapping(value="/registration")
     public ModelAndView registration(ModelMap modelMap) {
         ModelAndView modelAndView = new ModelAndView("registration");
         modelMap.put("username", securityService.getCurrentUserName());
-        User user = new User();
-        modelAndView.addObject("user", user);
+        UserDto userDto = new UserDto();
+        modelAndView.addObject("user", userDto);
         return modelAndView;
     }
 
     @PostMapping(value="/register")
-    public ModelAndView register(@Valid User user, BindingResult bindingResult,  ModelMap modelMap) {
+    public ModelAndView register(@Valid UserDto userDto, BindingResult bindingResult,  ModelMap modelMap) {
+        User user = dtoService.convertToUser(userDto);
         ModelAndView modelAndView = new ModelAndView("register");
         modelMap.put("username", securityService.getCurrentUserName());
         if (bindingResult.hasErrors()) {
@@ -73,8 +77,8 @@ public class LoginController {
     public ModelAndView logIn(ModelMap modelMap) {
         ModelAndView modelAndView = new ModelAndView("login");
         modelMap.put("username", securityService.getCurrentUserName());
-        User user = new User();
-        modelAndView.addObject("user", user);
+        UserDto userDto = new UserDto();
+        modelAndView.addObject("user", userDto);
         return modelAndView;
     }
 
@@ -86,6 +90,4 @@ public class LoginController {
         }
         return "redirect:/";
     }
-
-
 }

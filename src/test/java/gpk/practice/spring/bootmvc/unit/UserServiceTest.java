@@ -15,22 +15,25 @@ import static org.mockito.Mockito.when;
 
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
+@RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
 
 	@Mock
 	UserRepository mockUserRepository;
 	@Mock
 	RoleRepository mockRoleRepository;
+	@Mock
+	BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	private UserService userService;
 	private User user;
 
 	@Before
 	public void init() {
-        userService = new UserService(mockUserRepository, mockRoleRepository);
+        userService = new UserService(mockUserRepository, mockRoleRepository, bCryptPasswordEncoder);
 
 		user = new User();
 		user.setEmail("john@mail.com");

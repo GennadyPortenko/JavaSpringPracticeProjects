@@ -1,5 +1,6 @@
 package gpk.practice.spring.bootmvc.configuration;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,10 +19,10 @@ import javax.sql.DataSource;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
+@RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {

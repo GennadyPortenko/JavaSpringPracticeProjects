@@ -4,6 +4,7 @@ import gpk.practice.spring.bootmvc.model.Role;
 import gpk.practice.spring.bootmvc.model.User;
 import gpk.practice.spring.bootmvc.repository.RoleRepository;
 import gpk.practice.spring.bootmvc.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,17 +12,13 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.HashSet;
 
-@Service("userService")
+@Service
+@RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class UserService {
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    @Autowired
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     public User registerNewUserAccount(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setActive(1);
@@ -29,8 +26,8 @@ public class UserService {
         user.setRoles(new HashSet<Role>(Arrays.asList(userRole)));
         return userRepository.save(user);
     }
-    public User findByUsername(String login) {
-        return userRepository.findByUsername(login);
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
