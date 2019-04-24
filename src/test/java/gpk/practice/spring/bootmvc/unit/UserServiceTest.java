@@ -1,4 +1,4 @@
-package gpk.practice.spring.bootmvc;
+package gpk.practice.spring.bootmvc.unit;
 
 import gpk.practice.spring.bootmvc.model.User;
 import gpk.practice.spring.bootmvc.repository.RoleRepository;
@@ -12,9 +12,9 @@ import org.mockito.Mock;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-
 
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
@@ -37,12 +37,19 @@ public class UserServiceTest {
 		user.setUsername("John");
 
 		when(mockUserRepository.findByEmail(anyString())).thenReturn(user);
+		when(mockUserRepository.findByUsername(anyString())).thenReturn(user);
 	}
 
 	@Test
-	public void testFindByEmail() {
+	public void givenUserService_whenFindByEmail_thenReturnsUser() {
 		final String email = "john@mail.com";
 		assertEquals(userService.findByEmail(email).getEmail(), user.getEmail());
+	}
+
+	@Test
+	public void givenUserService_whenFindByUsername_thenReturnsUser() {
+		final String username = "John";
+		assertEquals(userService.findByUsername(username).getUsername(), user.getUsername());
 	}
 
 }

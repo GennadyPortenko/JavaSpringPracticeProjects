@@ -29,7 +29,7 @@ public class UserService {
         user.setRoles(new HashSet<Role>(Arrays.asList(userRole)));
         return userRepository.save(user);
     }
-    public User findByLogin(String login) {
+    public User findByUsername(String login) {
         return userRepository.findByUsername(login);
     }
     public User findByEmail(String email) {

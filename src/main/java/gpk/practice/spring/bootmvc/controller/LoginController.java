@@ -23,7 +23,7 @@ public class LoginController {
     @Autowired
     private UserService userService;
     @Autowired
-    SecurityService securityService;
+    private SecurityService securityService;
 
     @GetMapping(value="/registration")
     public ModelAndView registration(ModelMap modelMap) {
@@ -44,7 +44,7 @@ public class LoginController {
             return modelAndView;
         }
         try {
-            User userFoundByLogin = userService.findByLogin(user.getUsername());
+            User userFoundByLogin = userService.findByUsername(user.getUsername());
             User userFoundByEmail = userService.findByEmail(user.getEmail());
             if ( userFoundByLogin != null ) {
                 modelMap.put("registered_f", false);
@@ -79,7 +79,7 @@ public class LoginController {
     }
 
     @GetMapping(value="/logout")
-    public String logoutPage (HttpServletRequest request, HttpServletResponse response) {
+    public String logOut(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null){
             new SecurityContextLogoutHandler().logout(request, response, auth);
