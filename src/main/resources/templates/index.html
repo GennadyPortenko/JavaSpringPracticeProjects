@@ -6,26 +6,33 @@
     <title>Главная</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.css}">
+    <script th:src="@{/vendor/jquery/js/jquery.min.js}"></script>
 </head>
 <body>
   <div th:replace="/include/header :: header"></div>
   <script>
-       function performAjaxCall(){
+       function performAjaxCall() {
+       console.log("performing ajax call ...");
+       var data = {};
+       data["username"] = "Bob";
+       data["email"] = "bob@bob.com";
        $.ajax({
-        type: "post",
-        url: "http://localhost:8080/",
+        type: "POST",
+        contentType: "application/json",
+        url: "http://localhost:8080/messenger/poll",
+        data: JSON.stringify(data),
+        dataType: "json",
         cache: false,
-        data:'userName=' + "Bob" + "&email=" + "bob@bob.com",
+        timeout: 600000,
         success: function(response){
-         $('#result').html("");
-         var obj = JSON.parse(response);
-         console.log("user name : " + obj.userName + ", email : " + obj.email);
+         console.log("username : " + response.username + ", email : " + response.email);
         },
         error: function(){
          console.log('Error while performing request..');
         }
        });
       }
+      performAjaxCall();
   </script>
 </body>
 </html>
