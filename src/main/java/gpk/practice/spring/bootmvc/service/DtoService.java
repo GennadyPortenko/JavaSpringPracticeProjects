@@ -19,6 +19,7 @@ public class DtoService {
 
     public User convertToUser(UserDto userDto) {
         User user = modelMapper.map(userDto, User.class);
+        user.setPassword(null);
         return user;
     }
 }
