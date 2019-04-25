@@ -10,33 +10,22 @@
 <body>
   <div th:replace="/include/header :: header"></div>
   <script>
-  function display(data) {
-    console.log("data" + JSON.stringify(data, null, 4));
-  }
-     var search = {}
-		search["username"] = "john";
-		search["email"] = "john@john.com";
-     console.log(${home});
-     $.ajax({
-			type : "POST",
-			contentType : "application/json",
-			url : "${home}ajaxtest",
-			data : JSON.stringify(search),
-			dataType : 'json',
-			timeout : 100000,
-			success : function(data) {
-				console.log("SUCCESS: ", data);
-				display(data);
-			},
-			error : function(e) {
-				console.log("ERROR: ", e);
-				display(e);
-			},
-			done : function(e) {
-				console.log("DONE");
-				enableSearchButton(true);
-			}
-		});
+       function performAjaxCall(){
+       $.ajax({
+        type: "post",
+        url: "http://localhost:8080/",
+        cache: false,
+        data:'userName=' + "Bob" + "&email=" + "bob@bob.com",
+        success: function(response){
+         $('#result').html("");
+         var obj = JSON.parse(response);
+         console.log("user name : " + obj.userName + ", email : " + obj.email);
+        },
+        error: function(){
+         console.log('Error while performing request..');
+        }
+       });
+      }
   </script>
 </body>
 </html>
