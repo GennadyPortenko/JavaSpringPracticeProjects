@@ -6,18 +6,28 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.Set;
 
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name="role")
+@Table
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Role {
+public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="role_id")
+    @Column(name="message_id")
     int id;
+    @NotNull
+    Instant datetime;
     @NotEmpty
-    String role;
+    String text;
+    @NotNull
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="user_fk")
+    User user;
 }

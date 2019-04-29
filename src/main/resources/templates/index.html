@@ -7,32 +7,13 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.css}">
     <script th:src="@{/vendor/jquery/js/jquery.min.js}"></script>
+    <script th:src="@{/js/longpolling.js}"></script>
+    <script th:src="@{/js/index.js}"></script>
 </head>
 <body>
   <div th:replace="/include/header :: header"></div>
   <script>
-       function performAjaxCall() {
-       console.log("performing ajax call ...");
-       var data = {};
-       data["username"] = "Bob";
-       data["email"] = "bob@bob.com";
-       $.ajax({
-        type: "POST",
-        contentType: "application/json",
-        url: "http://localhost:8080/messenger/poll",
-        data: JSON.stringify(data),
-        dataType: "json",
-        cache: false,
-        timeout: 600000,
-        success: function(response){
-         console.log("username : " + response.username + ", email : " + response.email);
-        },
-        error: function(){
-         console.log('Error while performing request..');
-        }
-       });
-      }
-      performAjaxCall();
+
   </script>
 </body>
 </html>
