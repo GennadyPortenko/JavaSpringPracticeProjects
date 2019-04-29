@@ -1,6 +1,8 @@
 package gpk.practice.spring.bootmvc.service;
 
+import gpk.practice.spring.bootmvc.dto.MessageDto;
 import gpk.practice.spring.bootmvc.dto.UserDto;
+import gpk.practice.spring.bootmvc.model.Message;
 import gpk.practice.spring.bootmvc.model.User;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -14,12 +16,19 @@ public class DtoService {
 
     public UserDto convertToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
+        userDto.setPassword(null);
         return userDto;
     }
 
     public User convertToUser(UserDto userDto) {
-        User user = modelMapper.map(userDto, User.class);
-        user.setPassword(null);
-        return user;
+        return modelMapper.map(userDto, User.class);
+    }
+
+    public MessageDto convertToDto(Message message) {
+        return modelMapper.map(message, MessageDto.class);
+    }
+
+    public Message convertToMessage(MessageDto messageDto) {
+        return modelMapper.map(messageDto, Message.class);
     }
 }
