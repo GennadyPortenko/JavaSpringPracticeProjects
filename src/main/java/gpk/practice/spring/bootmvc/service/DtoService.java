@@ -9,10 +9,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class DtoService {
     private final ModelMapper modelMapper;
+    private final UserService userService;
 
     public UserDto convertToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
@@ -25,10 +30,26 @@ public class DtoService {
     }
 
     public MessageDto convertToDto(Message message) {
-        return modelMapper.map(message, MessageDto.class);
+        MessageDto messageDto = modelMapper.map(message, MessageDto.class);
+        messageDto.setUsername(message.getUser().getUsername());
+        if (message.getMessagesToReply() != null) {
+            messageDto.setMessagesToReply(message.getMessagesToReply().stream().
+                    map(msgToRply -> convertToDto(msgToRply) ).collect(Collectors.toList()));
+        }
+        return messageDto;
     }
 
     public Message convertToMessage(MessageDto messageDto) {
-        return modelMapper.map(messageDto, Message.class);
+        Message message = modelMapper.map(messageDto, Message.class);
+        message.setUser(userService.findByUsername(messageDto.getUsername()));
+        if (messageDto.getMessagesToReply() == null) {
+            return message;
+        }
+        List<Message> messagesToReply = new ArrayList<>();
+        for (MessageDto messageToReply : messageDto.getMessagesToReply()) {
+            messagesToReply.add(convertToMessage(messageToReply));
+        }
+        message.setMessagesToReply(messagesToReply);
+        return message;
     }
 }

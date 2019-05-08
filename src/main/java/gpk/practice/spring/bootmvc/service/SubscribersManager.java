@@ -6,8 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -28,12 +26,9 @@ public class SubscribersManager {
         removeSubscriber(subscriber);
     }
 
-    public void broadcast() {
+    public void broadcast(List<MessageDto> messages) {
         for (LongPollSubscriber subscriber : subscribers) {
-            List<MessageDto> response = new ArrayList<>();
-            response.add(new MessageDto(1, Instant.now(), "Message 1 text"));
-            response.add(new MessageDto(2, Instant.now(), "Message 2 text"));
-            subscriber.getResponse().setResult(new ResponseEntity<>(response, HttpStatus.OK));
+            subscriber.getResponse().setResult(new ResponseEntity<>(messages, HttpStatus.OK));
             removeSubscriber(subscriber);
         }
     }
