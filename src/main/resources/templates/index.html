@@ -6,14 +6,52 @@
     <title>Главная</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/vendor/perfect-scrollbar/css/perfect-scrollbar.css}">
     <script th:src="@{/vendor/jquery/js/jquery.min.js}"></script>
+    <script th:src="@{/vendor/perfect-scrollbar/js/perfect-scrollbar.min.js}"></script>
     <script th:src="@{/js/longpolling.js}"></script>
+    <script th:src="@{/js/sendMessage.js}"></script>
     <script th:src="@{/js/index.js}"></script>
+    <script th:src="@{/js/initCustomScrollbar.js}"></script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+        var current_username_ = /*[[${username}]]*/ null;
+      /*]]>*/
+    </script>
 </head>
 <body>
   <div th:replace="/include/header :: header"></div>
-  <script>
-
-  </script>
+    <div class="container">
+      <div class="messenger">
+        <div class = "messages-container" id="messages-container">
+          <div  class="content" id="messages-container-content">
+            <div th:each="message: ${messages}" th:message_id="${message.id}" class="message-wrapper message-wrapper-left"
+                 th:classappend="${message.username} != ${username} ? message-wrapper-notme : message-wrapper-me">
+                <span th:if="${message.username} != ${username}" th:text="${message.username}" class="username"></span>
+                <span th:text="${message.datetime}" class="datetime"></span>
+                <button class="reply-btn">ответить</button>
+                <div th:each="messageToReply: ${message.messagesToReply}" class="message-to-reply-wrapper">
+                    <div class="message-to-reply">
+                        <div class="info">
+                            <span th:text="${messageToReply.username}"></span> писал :
+                        </div>
+                        <div th:text="${messageToReply.text}" class="text"></div>
+                    </div>
+                </div>
+                <span th:text="${message.text}" class="message"></span>
+            </div>
+          </div>
+        </div>
+      <div class = "message-textarea-wrapper">
+        <div class="messages-to-reply hidden" id="messages-to-reply">
+        </div>
+        <div class="content">
+          <textarea class = "message-textarea" id="message-textarea"></textarea>
+          <button class="send-message-btn" id="send-message-btn">[О]тправить</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

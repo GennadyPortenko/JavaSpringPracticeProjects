@@ -4,8 +4,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,8 +13,7 @@ import java.time.Instant;
 public class MessageDto {
     @Getter
     @Setter
-    int id;
-    @NotNull
+    long id;
     @Getter
     @Setter
     Instant datetime;
@@ -22,4 +21,10 @@ public class MessageDto {
     @Getter
     @Setter
     String text;
+    @Getter
+    @Setter
+    String username;
+    @Getter
+    @Setter
+    List<MessageDto> MessagesToReply;
 }

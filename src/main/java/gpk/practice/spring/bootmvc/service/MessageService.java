@@ -1,39 +1,41 @@
 package gpk.practice.spring.bootmvc.service;
 
 import gpk.practice.spring.bootmvc.model.Message;
-import gpk.practice.spring.bootmvc.model.Role;
 import gpk.practice.spring.bootmvc.model.User;
-import gpk.practice.spring.bootmvc.repository.RoleRepository;
-import gpk.practice.spring.bootmvc.repository.UserRepository;
+import gpk.practice.spring.bootmvc.repository.MessageRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MessageService {
-    // final UserRepository messageRepository;
+    final MessageRepository messageRepository;
 
-    /*
     public Message saveMessage(Message message) {
         message.setDatetime(Instant.now());
-        return messageRepository.save(Message);
+        List<Message> messagesToReply = new ArrayList<>();
+        message.getMessagesToReply().forEach(msgToRply ->
+            messagesToReply.add(findById(msgToRply.getId()))
+        );
+        message.setMessagesToReply(messagesToReply);
+        return messageRepository.save(message);
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Message findById(long id) {
+        return messageRepository.findById(id);
     }
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public Set<Message> findByUser(User user) {
+        return messageRepository.findByUser(user);
     }
-    */
+    public List<Message> findAll(){
+        return messageRepository.findAll();
+    }
 
 }
