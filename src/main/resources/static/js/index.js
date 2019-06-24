@@ -1,3 +1,6 @@
+// var hostURL = "http://localhost:8080"
+var hostURL = "https://spring-mvc-chat.herokuapp.com";
+
 function scrollToTheEnd(duration) {
   $("#messages-container").animate({
     scrollTop:$("#messages-container")[0].scrollHeight - $(".message").last().height()
@@ -98,7 +101,8 @@ $(document).ready(function() {
      if (message['text'] != '') {
        $('#message-textarea').val('');
        sendMessage(message, function() {  },
-                            function() {  } );
+                            function() {  },
+                             hostURL);
      }
      $('.messages-to-reply').empty();
      hideMessagesToReplyBlock();
@@ -113,5 +117,5 @@ $(document).ready(function() {
 
   var requestData = {};
   requestData['lastMessageId'] = 0;
-  longPoll(requestData, addMessages);
+  longPoll(requestData, addMessages, hostURL);
 });

@@ -1,9 +1,9 @@
-function sendMessage(requestData, onSuccess, onError) {
+function sendMessage(requestData, onSuccess, onError, hostURL) {
   console.log("sending message : " + requestData["text"]);
   $.ajax({
     type: "POST",
     contentType: "application/json",
-    url: "http://localhost:8080/messenger/new_message",
+    url: hostURL + "/messenger/new_message",
     data: JSON.stringify(requestData),
     dataType: "json",
     cache: false,

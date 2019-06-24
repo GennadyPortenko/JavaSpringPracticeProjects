@@ -45,6 +45,7 @@ public class MainController {
         return modelAndView;
     }
 
+    @CrossOrigin(origins = "http://localhost:9000")
     @PostMapping(value="/messenger/poll")
     public DeferredResult<ResponseEntity<?>> processLongPoll(@RequestBody LongPollRequest request) {
         DeferredResult<ResponseEntity<?>> dr = new DeferredResult<>(LONG_POLL_TIMEOUT.longValue());

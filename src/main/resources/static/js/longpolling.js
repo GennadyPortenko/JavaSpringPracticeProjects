@@ -1,8 +1,8 @@
-function longPoll(requestData, processMessages) {
+function longPoll(requestData, processMessages, hostURL) {
   $.ajax({
     type: "POST",
     contentType: "application/json",
-    url: "http://localhost:8080/messenger/poll",
+    url: hostURL + "/messenger/poll",
     data: JSON.stringify(requestData),
     dataType: "json",
     cache: false,
@@ -12,14 +12,14 @@ function longPoll(requestData, processMessages) {
         case "success" :
           var messages = JSON.parse(request.responseText);
           processMessages(messages);
-          longPoll(requestData, processMessages);
+          longPoll(requestData, processMessages, hostURL);
           break;
         case "nocontent" :  //  long polling timeout (no new messages available)
           // console.log("no content");
-          longPoll(requestData, processMessages);
+          longPoll(requestData, processMessages, hostURL);
           break;
         default :  //  error or server unavailable
-          setTimeout(longPoll(requestData, processMessages), 2000);
+          setTimeout(longPoll(requestData, processMessages, hostURL), 2000);
           break;
       }
     }
