@@ -12,5 +12,5 @@ import lombok.experimental.FieldDefaults;
 public class LongPollRequest {
     @Getter
     @Setter
-    private long lastMessageId;
+    long lastMessageId;
 }

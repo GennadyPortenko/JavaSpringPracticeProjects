@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,23 +31,31 @@ public class MainController {
     private final DtoService dtoService;
     private final SubscribersManager subscribersManager;
     private final MessageService messageService;
-    private final UserService userService;
+    private AtomicLong lastMessageId = new AtomicLong(-1);
 
     @RequestMapping(value="/")
-    public ModelAndView messenger(ModelMap modelMap) {
+    public ModelAndView messenger(HttpServletRequest request, ModelMap modelMap) {
+        HttpSession session = request.getSession();
+        if (session.getAttribute("username") == null) {
+            request.getSession().setAttribute("username", securityService.getCurrentUserName());
+        }
         ModelAndView modelAndView = new ModelAndView("index");
-        String currentUser = securityService.getCurrentUserName();
-        modelMap.put("username", currentUser);
         modelMap.put("messages", messageService.findAll().stream()
-                .map(message -> dtoService.convertToDto(message)).collect(Collectors.toList()));
+                .map(dtoService::convertToDto).collect(Collectors.toList()));
         return modelAndView;
     }
 
     @PostMapping(value="/messenger/poll")
-    public DeferredResult<ResponseEntity<?>> testAjax(@RequestBody LongPollRequest request) {
+    public DeferredResult<ResponseEntity<?>> processLongPoll(@RequestBody LongPollRequest request) {
         DeferredResult<ResponseEntity<?>> dr = new DeferredResult<>(LONG_POLL_TIMEOUT.longValue());
-        LongPollSubscriber subscriber = new LongPollSubscriber(dr, request.getLastMessageId());
+        long clientLastMessageId = request.getLastMessageId();
+        if (this.lastMessageId.get() > clientLastMessageId) {
+            // сразу же вернуть результат с более новыми сообщениями, если они есть
+            dr.setResult(new ResponseEntity<>(messageService.findAllAfterId(clientLastMessageId), HttpStatus.OK));
+        }
+        LongPollSubscriber subscriber = new LongPollSubscriber(dr, clientLastMessageId);
         dr.onTimeout(() -> {
+            /* послать по таймауту ответ за ajax-запрос с HTTP статусом NO_CONTENT*/
             subscribersManager.abortSubscriber(subscriber);
         });
         subscribersManager.addSubscriber(subscriber);
@@ -52,13 +63,18 @@ public class MainController {
     }
 
     @PostMapping(value="/messenger/new_message")
-    public ResponseEntity<?> newMessage(@RequestBody MessageDto messageDto) {
-        System.out.println("message : " + messageDto.getText());
-        messageDto.setUsername(securityService.getCurrentUserName());
-        Message message = dtoService.convertToMessage(messageDto);
-        message.setDatetime(Instant.now());
-        messageService.saveMessage(message);
-        subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(message)));
+    public ResponseEntity<?> newMessage(@RequestBody MessageDto newMessageDto) {
+        newMessageDto.setUsername(securityService.getCurrentUserName());
+        Message newMessage = dtoService.convertToMessage(newMessageDto);
+        newMessage.setDatetime(Instant.now());
+        Message savedMessage = messageService.saveMessage(newMessage);
+
+        /* разослать новое(ые) сообщение(я) всем long-poll подписчикам */
+        if (savedMessage == null) {
+            return new ResponseEntity<>(new Message(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        lastMessageId.set(savedMessage.getId());
+        subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(savedMessage)));
         return new ResponseEntity<>(new Message(), HttpStatus.OK);
     }
 

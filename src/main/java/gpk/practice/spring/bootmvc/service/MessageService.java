@@ -1,5 +1,6 @@
 package gpk.practice.spring.bootmvc.service;
 
+import gpk.practice.spring.bootmvc.jpaspecification.MessageSpecifications;
 import gpk.practice.spring.bootmvc.model.Message;
 import gpk.practice.spring.bootmvc.model.User;
 import gpk.practice.spring.bootmvc.repository.MessageRepository;
@@ -7,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -37,5 +39,7 @@ public class MessageService {
     public List<Message> findAll(){
         return messageRepository.findAll();
     }
-
+    public List<Message> findAllAfterId(long id) {
+        return messageRepository.findAll(MessageSpecifications.IdMoreThan(id));
+    }
 }

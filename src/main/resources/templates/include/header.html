@@ -1,14 +1,14 @@
 <div th:fragment="header" class ="container">
     <div class = "topbar">
         <a th:href="@{/}" class="topbar-elem topbar-elem-left topbar-link">главная</a>
-        <div th:switch="${username}" class="topbar-elem">
+        <div th:switch="${session.username}" class="topbar-elem">
             <span th:case="null" >
                 <a th:href="@{/login}" class="topbar-link">войти</a>
                 <a th:href="@{/registration}" class="topbar-link topbar-link-small">регистрация</a>
             </span>
             <span th:case="*">
                 <span class="topbar-msg">Вы вошли как</span>
-                <span th:text="${username}" class="topbar-login"></span>
+                <span th:text="${session.username}" class="topbar-login"></span>
                 <a th:href="@{/logout}" class="topbar-link topbar-small">выйти</a>
             </span>
         </div>

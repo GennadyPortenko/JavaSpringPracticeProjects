@@ -11,7 +11,7 @@ import java.util.Set;
 @Entity
 @Data
 @NoArgsConstructor
-@Table
+@Table(name = "account")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     @Id

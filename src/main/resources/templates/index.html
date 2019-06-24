@@ -16,7 +16,7 @@
 
     <script th:inline="javascript">
       /*<![CDATA[*/
-        var current_username_ = /*[[${username}]]*/ null;
+        var current_username_ = /*[[${session.username}]]*/ null;
       /*]]>*/
     </script>
 </head>
@@ -27,8 +27,8 @@
         <div class = "messages-container" id="messages-container">
           <div  class="content" id="messages-container-content">
             <div th:each="message: ${messages}" th:message_id="${message.id}" class="message-wrapper message-wrapper-left"
-                 th:classappend="${message.username} != ${username} ? message-wrapper-notme : message-wrapper-me">
-                <span th:if="${message.username} != ${username}" th:text="${message.username}" class="username"></span>
+                 th:classappend="${message.username} != ${session.username} ? message-wrapper-notme : message-wrapper-me">
+                <span th:if="${message.username} != ${session.username}" th:text="${message.username}" class="username"></span>
                 <span th:text="${message.datetime}" class="datetime"></span>
                 <button class="reply-btn">ответить</button>
                 <div th:each="messageToReply: ${message.messagesToReply}" class="message-to-reply-wrapper">
