@@ -57,8 +57,9 @@ public class LoginController {
                 modelMap.put("registered_f", false);
                 modelMap.put("error_msg", "Пользователь с таким email уже существует");
             } else {
-                modelMap.put("registered_f", true);
                 userService.registerNewUserAccount(user);
+                modelMap.put("registered_f", true);
+                modelMap.put("username", user.getUsername());
             }
         } catch (Exception /* NonUniqueResultException */ e) {
             modelMap.put("registered_f", false);
