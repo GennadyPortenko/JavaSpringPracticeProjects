@@ -45,21 +45,23 @@ public class MainController {
         return modelAndView;
     }
 
-    @CrossOrigin(origins = "http://localhost:9000")
     @PostMapping(value="/messenger/poll")
     public DeferredResult<ResponseEntity<?>> processLongPoll(@RequestBody LongPollRequest request) {
         DeferredResult<ResponseEntity<?>> dr = new DeferredResult<>(LONG_POLL_TIMEOUT.longValue());
         long clientLastMessageId = request.getLastMessageId();
-        if (this.lastMessageId.get() > clientLastMessageId) {
-            // сразу же вернуть результат с более новыми сообщениями, если они есть
-            dr.setResult(new ResponseEntity<>(messageService.findAllAfterId(clientLastMessageId), HttpStatus.OK));
-        }
-        LongPollSubscriber subscriber = new LongPollSubscriber(dr, clientLastMessageId);
-        dr.onTimeout(() -> {
-            /* послать по таймауту ответ за ajax-запрос с HTTP статусом NO_CONTENT*/
-            subscribersManager.abortSubscriber(subscriber);
-        });
-        subscribersManager.addSubscriber(subscriber);
+        //FIXME
+//        if (this.lastMessageId.get() > clientLastMessageId) {
+//            // сразу же вернуть результат с более новыми сообщениями, если они есть
+//            dr.setResult(new ResponseEntity<>(messageService.findAllAfterId(clientLastMessageId).stream()
+//                                                .map(dtoService::convertToDto).collect(Collectors.toList()), HttpStatus.OK));
+//        } else {
+            LongPollSubscriber subscriber = new LongPollSubscriber(dr, clientLastMessageId);
+            dr.onTimeout(() -> {
+                /* послать по таймауту ответ за ajax-запрос с HTTP статусом NO_CONTENT*/
+                subscribersManager.abortSubscriber(subscriber);
+            });
+            subscribersManager.addSubscriber(subscriber);
+//        }
         return dr;
     }
 
@@ -70,13 +72,13 @@ public class MainController {
         newMessage.setDatetime(Instant.now());
         Message savedMessage = messageService.saveMessage(newMessage);
 
-        /* разослать новое(ые) сообщение(я) всем long-poll подписчикам */
         if (savedMessage == null) {
             return new ResponseEntity<>(new Message(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        /* разослать новое(ые) сообщение(я) всем long-poll подписчикам */
         lastMessageId.set(savedMessage.getId());
         subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(savedMessage)));
-        return new ResponseEntity<>(new Message(), HttpStatus.OK);
+        return new ResponseEntity<>(new Message() /* (empty) */, HttpStatus.OK);
     }
 
 }

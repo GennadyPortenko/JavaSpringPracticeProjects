@@ -1,5 +1,5 @@
-// var hostURL = "http://localhost:8080"
-var hostURL = "https://spring-mvc-chat.herokuapp.com";
+var hostURL = "http://localhost:8080"
+// var hostURL = "https://spring-mvc-chat.herokuapp.com";
 
 function scrollToTheEnd(duration) {
   $("#messages-container").animate({
@@ -9,7 +9,7 @@ function scrollToTheEnd(duration) {
 function addMessages(messages) {
   $.each(messages, function(k, message) {
     var messageHtml =
-    '<div class="message-wrapper message-wrapper-left ';
+    '<div data-message-id=' + message.id + ' class="message-wrapper message-wrapper-left ';
     if (current_username_ == message.username) {
       messageHtml += 'message-wrapper-me">';
     } else {
@@ -37,6 +37,7 @@ function addMessages(messages) {
     $("#messages-container-content").append(messageHtml);
     scrollToTheEnd(500);
   });
+  bindMessagesToReply();
 }
 
 function hideMessagesToReplyBlock() {
@@ -49,8 +50,9 @@ function showMessagesToReplyBlock() {
 }
 
 function bindMessagesToReply() {
+  $('.reply-btn').click( function() { addMessageToReply( $(this).parent() ); } );
   $('.message-to-reply > .close').click(function() {
-    $(this).parent().remove()
+    $(this).parent().remove();
     if ( $('.messages-to-reply').children().length == 0 ) {
       hideMessagesToReplyBlock();
     }
@@ -58,7 +60,7 @@ function bindMessagesToReply() {
 }
 
 function messageToReplyAlreadyAdded(message) {
-  let n = $('#messages-to-reply').find('.message-to-reply[message_id = ' + message.attr('message_id') + ']').length;
+  let n = $('#messages-to-reply').find('.message-to-reply[data-message-id = ' + message.attr('data-message-id') + ']').length;
   if (n != 0) {
     return true;
   } else {
@@ -70,7 +72,7 @@ function addMessageToReply(message) {
   if (messageToReplyAlreadyAdded(message)) {
     return;
   }
-  var messageToReply = '<div class="message-to-reply" message_id="'+ message.attr('message_id') +'">' +
+  var messageToReply = '<div class="message-to-reply" data-message-id="'+ message.attr('data-message-id') +'">' +
                            '<button class="close">x</button>' +
                            '<span class="text">' + message.find('.message').text() + '</span>'
   $('#messages-to-reply').append(messageToReply)
@@ -87,7 +89,6 @@ $(document).ready(function() {
    scrollToTheEnd(0);
 
    bindMessagesToReply();
-   $('.reply-btn').click( function() { addMessageToReply( $(this).parent() ) } );
 
    $('#send-message-btn').click(function() {
      var message = {}
@@ -95,8 +96,9 @@ $(document).ready(function() {
      message.messagesToReply = [];
      $('.messages-to-reply').children().each(function(index) {
          messageToReply = {}
-         messageToReply['id'] = $(this).attr('message_id');
+         messageToReply['id'] = $(this).attr('data-message-id');
          message.messagesToReply.push(messageToReply);
+         console.log(message.messagesToReply);
      })
      if (message['text'] != '') {
        $('#message-textarea').val('');
@@ -116,6 +118,7 @@ $(document).ready(function() {
    });
 
   var requestData = {};
-  requestData['lastMessageId'] = 0;
+  // requestData['lastMessageId'] = 0;
+  requestData['lastMessageId'] = parseInt($(".messages-wrapper").last().attr('data-message-id'), 10);
   longPoll(requestData, addMessages, hostURL);
 });

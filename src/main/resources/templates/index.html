@@ -26,7 +26,7 @@
       <div class="messenger">
         <div class = "messages-container" id="messages-container">
           <div  class="content" id="messages-container-content">
-            <div th:each="message: ${messages}" th:message_id="${message.id}" class="message-wrapper message-wrapper-left"
+            <div th:each="message: ${messages}" th:attr = "data-message-id = ${message.id}" class="message-wrapper message-wrapper-left"
                  th:classappend="${message.username} != ${session.username} ? message-wrapper-notme : message-wrapper-me">
                 <span th:if="${message.username} != ${session.username}" th:text="${message.username}" class="username"></span>
                 <span th:text="${message.datetime}" class="datetime"></span>
