@@ -96,6 +96,9 @@ body {
   content:"";
 }
 .login-form__console-styled-border {
+  overflow:hidden;
+  display:block;
+  height:20px;
   font-size:13px;
   color:#ddd;
   background:black;
