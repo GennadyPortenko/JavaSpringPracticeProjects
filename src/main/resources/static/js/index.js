@@ -1,5 +1,5 @@
-var hostURL = "http://localhost:8080"
-// var hostURL = "https://spring-mvc-chat.herokuapp.com";
+// var hostURL = "http://localhost:8080"
+var hostURL = "https://spring-mvc-chat.herokuapp.com";
 
 function scrollToTheEnd(duration) {
   $("#messages-container").animate({
