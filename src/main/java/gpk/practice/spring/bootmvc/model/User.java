@@ -1,6 +1,8 @@
 package gpk.practice.spring.bootmvc.model;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
@@ -16,14 +18,12 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="user_id")
-    int id;
+    int userId;
     @NotEmpty
     @Email
     String email;
     @NotEmpty
-    @Column(name="name")
-    String username;
+    String name;
     @NotEmpty
     String password;
     int active;

@@ -1,28 +1,23 @@
 package gpk.practice.spring.bootmvc.dto;
 
 import lombok.AccessLevel;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
+@Data
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDto {
     @NotEmpty
     @Email
-    @Getter
-    @Setter
     String email;
     @NotEmpty
-    @Getter
-    @Setter
-    String username;
+    String name;
     @NotEmpty
-    @Getter
-    @Setter
     String password;
 }

@@ -7,24 +7,19 @@ import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
 import java.util.List;
 
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MessageDto {
-    @Getter
-    @Setter
+    @NonNull
     long id;
-    @Getter
-    @Setter
+    @NonNull
     Instant datetime;
+    @NonNull
     @NotEmpty
-    @Getter
-    @Setter
     String text;
-    @Getter
-    @Setter
+    @NonNull
     String username;
-    @Getter
-    @Setter
     List<MessageDto> MessagesToReply;
 }

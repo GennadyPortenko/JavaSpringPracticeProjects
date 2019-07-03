@@ -48,7 +48,7 @@ public class LoginController {
             return modelAndView;
         }
         try {
-            User userFoundByLogin = userService.findByUsername(user.getUsername());
+            User userFoundByLogin = userService.findByName(user.getName());
             User userFoundByEmail = userService.findByEmail(user.getEmail());
             if ( userFoundByLogin != null ) {
                 modelMap.put("registered_f", false);
@@ -59,7 +59,7 @@ public class LoginController {
             } else {
                 userService.registerNewUserAccount(user);
                 modelMap.put("registered_f", true);
-                modelMap.put("username", user.getUsername());
+                modelMap.put("username", user.getName());
             }
         } catch (Exception /* NonUniqueResultException */ e) {
             modelMap.put("registered_f", false);

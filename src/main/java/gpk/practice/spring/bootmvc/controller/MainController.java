@@ -4,14 +4,20 @@ import gpk.practice.spring.bootmvc.dto.LongPollRequest;
 import gpk.practice.spring.bootmvc.dto.MessageDto;
 import gpk.practice.spring.bootmvc.model.LongPollSubscriber;
 import gpk.practice.spring.bootmvc.model.Message;
-import gpk.practice.spring.bootmvc.service.*;
+import gpk.practice.spring.bootmvc.service.DtoService;
+import gpk.practice.spring.bootmvc.service.MessageService;
+import gpk.practice.spring.bootmvc.service.SecurityService;
+import gpk.practice.spring.bootmvc.service.SubscribersManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -76,7 +82,7 @@ public class MainController {
             return new ResponseEntity<>(new Message(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         /* разослать новое(ые) сообщение(я) всем long-poll подписчикам */
-        lastMessageId.set(savedMessage.getId());
+        lastMessageId.set(savedMessage.getMessageId());
         subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(savedMessage)));
         return new ResponseEntity<>(new Message() /* (empty) */, HttpStatus.OK);
     }

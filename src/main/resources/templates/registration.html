@@ -18,7 +18,7 @@
             <form action="#" th:action="@{/register}" th:object="${user}" method="post" data-toggle="validator" required="true" role="form"  >
               <div class="login-form-content">
                 <div class="login-form-title">Регистрация</div>
-                <div class="form-group"><input th:field="*{username}" class="login-form-input" id="form-login" required placeholder="Логин" name="login"></div>
+                <div class="form-group"><input th:field="*{name}" class="login-form-input" id="form-login" required placeholder="Логин" name="login"></div>
                 <div class="form-group"><input th:field="*{email}" class="login-form-input" id="form-email" required placeholder="email" name="email"></div>
                 <div class="form-group">
                   <input th:field="*{password}" class="login-form-input" id="form-password" type="password"
