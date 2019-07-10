@@ -37,10 +37,10 @@ public class UserServiceTest {
 
 		user = new User();
 		user.setEmail("john@mail.com");
-		user.setUsername("John");
+		user.setName("John");
 
 		when(mockUserRepository.findByEmail(anyString())).thenReturn(user);
-		when(mockUserRepository.findByUsername(anyString())).thenReturn(user);
+		when(mockUserRepository.findByName(anyString())).thenReturn(user);
 	}
 
 	@Test
@@ -50,9 +50,9 @@ public class UserServiceTest {
 	}
 
 	@Test
-	public void givenUserService_whenFindByUsername_thenReturnsUser() {
+	public void givenUserService_whenFindByName_thenReturnsUser() {
 		final String username = "John";
-		assertEquals(userService.findByUsername(username).getUsername(), user.getUsername());
+		assertEquals(userService.findByName(username).getName(), user.getName());
 	}
 
 }

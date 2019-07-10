@@ -25,7 +25,7 @@ public class MessageService {
         message.setDatetime(Instant.now());
         List<Message> messagesToReply = new ArrayList<>();
         message.getMessagesToReply().forEach(msgToRply ->
-            messagesToReply.add(findById(msgToRply.getId()))
+            messagesToReply.add(findById(msgToRply.getMessageId()))
         );
         message.setMessagesToReply(messagesToReply);
         return messageRepository.save(message);

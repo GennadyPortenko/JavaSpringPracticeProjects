@@ -16,8 +16,7 @@ import javax.validation.constraints.NotEmpty;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="role_id")
-    int id;
+    int toleId;
     @NotEmpty
     String role;
 }

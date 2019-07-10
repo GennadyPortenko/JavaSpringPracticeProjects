@@ -98,7 +98,6 @@ $(document).ready(function() {
          messageToReply = {}
          messageToReply['id'] = $(this).attr('data-message-id');
          message.messagesToReply.push(messageToReply);
-         console.log(message.messagesToReply);
      })
      if (message['text'] != '') {
        $('#message-textarea').val('');

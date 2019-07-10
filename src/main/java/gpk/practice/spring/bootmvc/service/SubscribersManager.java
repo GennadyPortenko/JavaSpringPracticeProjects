@@ -2,7 +2,6 @@ package gpk.practice.spring.bootmvc.service;
 
 import gpk.practice.spring.bootmvc.dto.MessageDto;
 import gpk.practice.spring.bootmvc.model.LongPollSubscriber;
-import gpk.practice.spring.bootmvc.model.Message;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

@@ -31,17 +31,17 @@ public class DtoService {
 
     public MessageDto convertToDto(Message message) {
         MessageDto messageDto = modelMapper.map(message, MessageDto.class);
-        messageDto.setUsername(message.getUser().getUsername());
+        messageDto.setUsername(message.getUser().getName());
         if (message.getMessagesToReply() != null) {
             messageDto.setMessagesToReply(message.getMessagesToReply().stream().
-                    map(msgToRply -> convertToDto(msgToRply) ).collect(Collectors.toList()));
+                    map(this::convertToDto).collect(Collectors.toList()));
         }
         return messageDto;
     }
 
     public Message convertToMessage(MessageDto messageDto) {
         Message message = modelMapper.map(messageDto, Message.class);
-        message.setUser(userService.findByUsername(messageDto.getUsername()));
+        message.setUser(userService.findByName(messageDto.getUsername()));
         if (messageDto.getMessagesToReply() == null) {
             return message;
         }
