@@ -1,6 +1,8 @@
 package gpk.practice.spring.bootmvc.service;
 
+import gpk.practice.spring.bootmvc.dto.IdDto;
 import gpk.practice.spring.bootmvc.dto.MessageDto;
+import gpk.practice.spring.bootmvc.dto.NewMessageDto;
 import gpk.practice.spring.bootmvc.dto.UserDto;
 import gpk.practice.spring.bootmvc.model.Message;
 import gpk.practice.spring.bootmvc.model.User;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class DtoService {
     private final ModelMapper modelMapper;
     private final UserService userService;
+    private final MessageService messageService;
 
     public UserDto convertToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
@@ -39,15 +42,19 @@ public class DtoService {
         return messageDto;
     }
 
-    public Message convertToMessage(MessageDto messageDto) {
+    public Message convertToMessage(NewMessageDto messageDto) {
         Message message = modelMapper.map(messageDto, Message.class);
-        message.setUser(userService.findByName(messageDto.getUsername()));
+        User user = userService.findByName(messageDto.getUsername());
+        if (user == null) {
+            return null;
+        }
+        message.setUser(user);
         if (messageDto.getMessagesToReply().isEmpty()) {
             return message;
         }
         List<Message> messagesToReply = new ArrayList<>();
-        for (MessageDto messageToReply : messageDto.getMessagesToReply()) {
-            messagesToReply.add(convertToMessage(messageToReply));
+        for (IdDto messageToReply: messageDto.getMessagesToReply()) {
+            messagesToReply.add(messageService.findById(messageToReply.getId()));
         }
         message.setMessagesToReply(messagesToReply);
         return message;

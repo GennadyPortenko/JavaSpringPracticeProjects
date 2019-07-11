@@ -2,6 +2,7 @@ package gpk.practice.spring.bootmvc.controller;
 
 import gpk.practice.spring.bootmvc.dto.LongPollRequest;
 import gpk.practice.spring.bootmvc.dto.MessageDto;
+import gpk.practice.spring.bootmvc.dto.NewMessageDto;
 import gpk.practice.spring.bootmvc.model.LongPollSubscriber;
 import gpk.practice.spring.bootmvc.model.Message;
 import gpk.practice.spring.bootmvc.service.DtoService;
@@ -23,7 +24,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -76,11 +76,14 @@ public class MainController {
     }
 
     @PostMapping(value="/messenger/new_message")
-    public ResponseEntity<?> newMessage(@RequestBody MessageDto newMessageDto) {
+    public ResponseEntity<?> newMessage(@RequestBody NewMessageDto newMessageDto) {
+        Message savedMessage = null;
+
         newMessageDto.setUsername(securityService.getCurrentUserName());
-        newMessageDto.setDatetime(Instant.now());
         Message newMessage = dtoService.convertToMessage(newMessageDto);
-        Message savedMessage = messageService.saveMessage(newMessage);
+        if (newMessage != null) {
+            savedMessage = messageService.saveMessage(newMessage);
+        }
 
         if (savedMessage == null) {
             return new ResponseEntity<>(new Message(), HttpStatus.INTERNAL_SERVER_ERROR);
