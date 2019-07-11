@@ -1,51 +1,62 @@
 package gpk.practice.spring.bootmvc.unit;
 
+import gpk.practice.spring.bootmvc.dto.IdDto;
 import gpk.practice.spring.bootmvc.dto.MessageDto;
+import gpk.practice.spring.bootmvc.dto.NewMessageDto;
 import gpk.practice.spring.bootmvc.dto.UserDto;
 import gpk.practice.spring.bootmvc.model.Message;
 import gpk.practice.spring.bootmvc.model.User;
 import gpk.practice.spring.bootmvc.service.DtoService;
+import gpk.practice.spring.bootmvc.service.MessageService;
 import gpk.practice.spring.bootmvc.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class DtoServiceTest {
-    private DtoService dtoService = null;
+    private DtoService dtoService;
 
     @Autowired
     private ModelMapper modelMapper;
 
-    @Mock
+    @MockBean
     private UserService userService;
+    @MockBean
+    private MessageService messageService;
 
     private final String testUsername = "John";
-    private User testUser = null;
+    private final User testUser = new User("", testUsername, "");
 
+    private final long testMessageId = 10;
+    private final String testMessageText = "test message text";
+    private final Message testMessage = new Message(Instant.now(), testMessageText, testUser);
+
+    private boolean initialized = false;
     @Before
     public void init() {
-        MockitoAnnotations.initMocks(this);
-        testUser = new User();
-        testUser.setName(testUsername);
-        Mockito.when(userService.findByName(testUsername))
-                .thenReturn(testUser);
+        if (!initialized) {
+            Mockito.when(userService.findByName(testUsername))
+                    .thenReturn(testUser);
+            Mockito.when(messageService.findById(testMessageId))
+                    .thenReturn(testMessage);
 
-        dtoService = new DtoService(modelMapper, userService); // for userDto mock usage by DtoService
+            dtoService = new DtoService(modelMapper, userService, messageService);
+
+            initialized = true;
+        }
     }
 
     @Test
@@ -73,28 +84,17 @@ public class DtoServiceTest {
     }
 
     @Test
-    public void testMessageDtoToMessageMapping() {
-        MessageDto messageDto = new MessageDto();
-        messageDto.setId(1L);
-        messageDto.setText("Test message text");
-        messageDto.setDatetime(Instant.now());
-        messageDto.setUsername(testUsername);
-        List<MessageDto> messagesDtoToReply = new ArrayList<>(
-                Arrays.asList(new MessageDto(1, Instant.now(), "message 1", testUsername, new ArrayList<>()),
-                              new MessageDto(1, Instant.now(), "message 1", testUsername, new ArrayList<>())
-                ));
-        messageDto.setMessagesToReply(messagesDtoToReply);
+    public void testNewMessageDtoToMessageMapping() {
+        NewMessageDto messageDto = new NewMessageDto("test message text", testUsername, Arrays.asList(new IdDto(testMessageId), new IdDto(testMessageId)));
 
         Message message = dtoService.convertToMessage(messageDto);
-        assertEquals(messageDto.getId(), message.getMessageId());
         assertEquals(messageDto.getText(), message.getText());
-        assertEquals(messageDto.getDatetime(), message.getDatetime());
         assertEquals(messageDto.getUsername(), message.getUser().getName());
-        List<Message> messagesToReply = new ArrayList<>();
-        for(MessageDto messageDtoToReply : messageDto.getMessagesToReply()) {
-            messagesToReply.add(dtoService.convertToMessage(messageDtoToReply));
+        assertNotEquals(message.getMessagesToReply().size(), 0);
+        for (Message messageToReply : message.getMessagesToReply()) {
+            assertEquals(messageToReply.getText(), testMessage.getText());
         }
-        assertEquals(messagesToReply, message.getMessagesToReply());
+
     }
 
     @Test
