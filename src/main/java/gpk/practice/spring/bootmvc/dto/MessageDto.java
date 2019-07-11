@@ -21,5 +21,6 @@ public class MessageDto {
     String text;
     @NonNull
     String username;
+    @NonNull
     List<MessageDto> MessagesToReply;
 }

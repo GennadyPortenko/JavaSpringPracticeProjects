@@ -6,7 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 public class MessageSpecifications {
 
     public static Specification<Message> IdMoreThan(long id) {
-        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.greaterThan(root.get("id"), id);
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.greaterThan(root.get("messageId"), id);
     }
 
 }

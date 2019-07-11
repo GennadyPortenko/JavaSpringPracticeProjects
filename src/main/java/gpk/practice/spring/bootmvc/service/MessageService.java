@@ -43,4 +43,5 @@ public class MessageService {
     public List<Message> findAllAfterId(long id) {
         return messageRepository.findAll(MessageSpecifications.IdMoreThan(id));
     }
+    public void deleteAll() { messageRepository.deleteAll(); }
 }

@@ -14,12 +14,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 @Controller
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
@@ -38,7 +38,7 @@ public class LoginController {
     }
 
     @PostMapping(value="/register")
-    public ModelAndView register(@Valid UserDto userDto, BindingResult bindingResult,  ModelMap modelMap) {
+    public ModelAndView register(@ModelAttribute UserDto userDto, BindingResult bindingResult, ModelMap modelMap) {
         User user = dtoService.convertToUser(userDto);
         ModelAndView modelAndView = new ModelAndView("register");
         modelMap.put("username", securityService.getCurrentUserName());
