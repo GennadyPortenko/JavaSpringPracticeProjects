@@ -1,10 +1,11 @@
-function longPoll(requestData, processMessages, hostURL) {
+function longPoll(prepareRequestData, processMessages, hostURL) {
   $.ajax({
     type: "POST",
     contentType: "application/json",
     url: hostURL + "/messenger/poll",
-    data: JSON.stringify(requestData),
+    data: JSON.stringify(prepareRequestData()),
     dataType: "json",
+    mimeType: 'application/json',
     cache: false,
     // timeout: 600000,
     complete: function(request, textStatus){
@@ -12,14 +13,14 @@ function longPoll(requestData, processMessages, hostURL) {
         case "success" :
           var messages = JSON.parse(request.responseText);
           processMessages(messages);
-          longPoll(requestData, processMessages, hostURL);
+          longPoll(prepareRequestData, processMessages, hostURL);
           break;
         case "nocontent" :  //  long polling timeout (no new messages available)
           // console.log("no content");
-          longPoll(requestData, processMessages, hostURL);
+          longPoll(prepareRequestData, processMessages, hostURL);
           break;
         default :  //  error or server unavailable
-          setTimeout(longPoll(requestData, processMessages, hostURL), 2000);
+          setTimeout(longPoll(prepareRequestData, processMessages, hostURL), 2000);
           break;
       }
     }

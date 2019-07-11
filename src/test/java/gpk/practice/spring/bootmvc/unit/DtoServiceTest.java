@@ -80,8 +80,8 @@ public class DtoServiceTest {
         messageDto.setDatetime(Instant.now());
         messageDto.setUsername(testUsername);
         List<MessageDto> messagesDtoToReply = new ArrayList<>(
-                Arrays.asList(new MessageDto(1, Instant.now(), "message 1", testUsername),
-                              new MessageDto(1, Instant.now(), "message 1", testUsername)
+                Arrays.asList(new MessageDto(1, Instant.now(), "message 1", testUsername, new ArrayList<>()),
+                              new MessageDto(1, Instant.now(), "message 1", testUsername, new ArrayList<>())
                 ));
         messageDto.setMessagesToReply(messagesDtoToReply);
 
@@ -104,8 +104,7 @@ public class DtoServiceTest {
         message.setText("Test message text");
         message.setDatetime(Instant.now());
         message.setUser(testUser);
-        message.setMessagesToReply(Arrays.asList(new Message(0, Instant.now(), "some text",
-                                                             testUser, null)));
+        message.setMessagesToReply(Arrays.asList(new Message(Instant.now(), "some text", testUser)));
         MessageDto messageDto = dtoService.convertToDto(message);
         assertEquals(messageDto.getId(), message.getMessageId());
         assertEquals(messageDto.getText(), message.getText());

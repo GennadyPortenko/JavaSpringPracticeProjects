@@ -80,6 +80,12 @@ function addMessageToReply(message) {
   bindMessagesToReply();
 }
 
+function prepareLongPollRequest() {
+  var requestData = {};
+  requestData['lastMessageId'] = parseInt($(".message-wrapper").last().attr("data-message-id"), 10);
+  return requestData;
+}
+
 $(document).ready(function() {
 
    initCustomScrollbar('#messages-container');
@@ -116,8 +122,5 @@ $(document).ready(function() {
      }
    });
 
-  var requestData = {};
-  // requestData['lastMessageId'] = 0;
-  requestData['lastMessageId'] = parseInt($(".messages-wrapper").last().attr('data-message-id'), 10);
-  longPoll(requestData, addMessages, hostURL);
+  longPoll(prepareLongPollRequest, addMessages, hostURL);
 });

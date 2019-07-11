@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -56,26 +57,29 @@ public class MainController {
         DeferredResult<ResponseEntity<?>> dr = new DeferredResult<>(LONG_POLL_TIMEOUT.longValue());
         long clientLastMessageId = request.getLastMessageId();
         //FIXME
-//        if (this.lastMessageId.get() > clientLastMessageId) {
-//            // сразу же вернуть результат с более новыми сообщениями, если они есть
-//            dr.setResult(new ResponseEntity<>(messageService.findAllAfterId(clientLastMessageId).stream()
-//                                                .map(dtoService::convertToDto).collect(Collectors.toList()), HttpStatus.OK));
-//        } else {
+        if (this.lastMessageId.get() > clientLastMessageId) {
+            // сразу же вернуть результат с более новыми сообщениями, если они есть
+
+            List<MessageDto> msgs = messageService.findAllAfterId(clientLastMessageId).stream()
+                                                .map(dtoService::convertToDto)
+                                                .collect(Collectors.toList());
+            dr.setResult(new ResponseEntity<>(msgs, HttpStatus.OK));
+        } else {
             LongPollSubscriber subscriber = new LongPollSubscriber(dr, clientLastMessageId);
             dr.onTimeout(() -> {
                 /* послать по таймауту ответ за ajax-запрос с HTTP статусом NO_CONTENT*/
                 subscribersManager.abortSubscriber(subscriber);
             });
             subscribersManager.addSubscriber(subscriber);
-//        }
+        }
         return dr;
     }
 
     @PostMapping(value="/messenger/new_message")
     public ResponseEntity<?> newMessage(@RequestBody MessageDto newMessageDto) {
         newMessageDto.setUsername(securityService.getCurrentUserName());
+        newMessageDto.setDatetime(Instant.now());
         Message newMessage = dtoService.convertToMessage(newMessageDto);
-        newMessage.setDatetime(Instant.now());
         Message savedMessage = messageService.saveMessage(newMessage);
 
         if (savedMessage == null) {

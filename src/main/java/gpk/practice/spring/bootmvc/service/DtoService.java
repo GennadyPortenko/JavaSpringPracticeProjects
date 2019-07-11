@@ -42,7 +42,7 @@ public class DtoService {
     public Message convertToMessage(MessageDto messageDto) {
         Message message = modelMapper.map(messageDto, Message.class);
         message.setUser(userService.findByName(messageDto.getUsername()));
-        if (messageDto.getMessagesToReply() == null) {
+        if (messageDto.getMessagesToReply().isEmpty()) {
             return message;
         }
         List<Message> messagesToReply = new ArrayList<>();
