@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -44,4 +45,8 @@ public class MessageService {
         return messageRepository.findAll(MessageSpecifications.IdMoreThan(id));
     }
     public void deleteAll() { messageRepository.deleteAll(); }
+    public long getNumberOfMessages() { return messageRepository.getNumberOfMessages(); }
+    public long getNumberOfMessagesOfUser(String userName) {
+        return messageRepository.getNumberOfMessagesOfUser(userName);
+    }
 }

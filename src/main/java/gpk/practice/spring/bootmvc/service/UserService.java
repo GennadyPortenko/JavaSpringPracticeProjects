@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
@@ -29,8 +32,14 @@ public class UserService {
     public User findByName(String username) {
         return userRepository.findByName(username);
     }
+    public User findByUserId(int id) {
+        return userRepository.findByUserId(id);
+    }
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
     public void deleteAll() { userRepository.deleteAll(); }
+    public List<String > getUserNames() {
+        return userRepository.findAll().stream().map(User::getName).collect(toList());
+    }
 }
