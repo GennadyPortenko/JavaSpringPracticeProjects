@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +23,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Transactional
     public User registerNewUserAccount(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setActive(1);
@@ -31,9 +33,6 @@ public class UserService {
     }
     public User findByName(String username) {
         return userRepository.findByName(username);
-    }
-    public User findByUserId(int id) {
-        return userRepository.findByUserId(id);
     }
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);

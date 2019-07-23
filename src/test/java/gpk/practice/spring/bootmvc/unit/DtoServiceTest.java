@@ -21,14 +21,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-@SpringBootTest
 @RunWith(SpringRunner.class)
+@SpringBootTest
 public class DtoServiceTest {
     private DtoService dtoService;
 
@@ -54,19 +53,12 @@ public class DtoServiceTest {
     private boolean initialized = false;
     @Before
     public void init() {
-        if (!initialized) {
-
-            System.out.println("------------------" + messageDateTimeFormatter.format(Instant.now()));
-
             Mockito.when(userService.findByName(testUsername))
                     .thenReturn(testUser);
             Mockito.when(messageService.findById(testMessageId))
                     .thenReturn(testMessage);
 
             dtoService = new DtoService(modelMapper, userService, messageService, messageDateTimeFormatter);
-
-            initialized = true;
-        }
     }
 
     @Test

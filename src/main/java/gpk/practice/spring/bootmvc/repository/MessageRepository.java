@@ -14,13 +14,17 @@ import java.util.Set;
 public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpecificationExecutor<Message> {
     Message findById(long id);
     Set<Message> findByUser(User user);
-    void deleteAll();
+
+    List<Message> findTop20ByOrderByMessageIdDesc();
+    List<Message> findTop3ByMessageIdOrderByMessageId(long id);
 
     @Query( nativeQuery = true,
             value = "SELECT COUNT (*) FROM message;" )
-    public long getNumberOfMessages();
+    long getNumberOfMessages();
 
     @Query( nativeQuery = true,
             value= "SELECT COUNT (*) FROM message WHERE user_fk = (SELECT user_id FROM account WHERE name = ?1);" )
-    public long getNumberOfMessagesOfUser(String userName);
+    long getNumberOfMessagesOfUser(String userName);
+
+    void deleteAll();
 }

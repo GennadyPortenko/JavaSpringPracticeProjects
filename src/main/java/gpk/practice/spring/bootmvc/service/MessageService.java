@@ -8,9 +8,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +44,7 @@ public class MessageService {
     public List<Message> findAllAfterId(long id) {
         return messageRepository.findAll(MessageSpecifications.IdMoreThan(id));
     }
+    public List<Message> findTop20Messages() { return messageRepository.findTop20ByOrderByMessageIdDesc(); }
     public void deleteAll() { messageRepository.deleteAll(); }
     public long getNumberOfMessages() { return messageRepository.getNumberOfMessages(); }
     public long getNumberOfMessagesOfUser(String userName) {
