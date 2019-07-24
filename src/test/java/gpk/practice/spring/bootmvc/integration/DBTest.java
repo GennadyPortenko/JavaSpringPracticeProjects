@@ -5,7 +5,6 @@ import gpk.practice.spring.bootmvc.configuration.AppConfig;
 import gpk.practice.spring.bootmvc.configuration.DBTestProfileConfig;
 import gpk.practice.spring.bootmvc.configuration.SecurityConfig;
 import gpk.practice.spring.bootmvc.model.Message;
-import gpk.practice.spring.bootmvc.model.Role;
 import gpk.practice.spring.bootmvc.model.User;
 import gpk.practice.spring.bootmvc.repository.MessageRepository;
 import gpk.practice.spring.bootmvc.repository.RoleRepository;
@@ -19,11 +18,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.*;
-
 import javax.transaction.Transactional;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
