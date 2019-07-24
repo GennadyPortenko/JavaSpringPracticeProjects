@@ -16,7 +16,7 @@ public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpec
     Set<Message> findByUser(User user);
 
     List<Message> findTop20ByOrderByMessageIdDesc();
-    List<Message> findTop3ByMessageIdOrderByMessageId(long id);
+    List<Message> findTop20ByMessageIdLessThanOrderByMessageIdDesc(long id);
 
     @Query( nativeQuery = true,
             value = "SELECT COUNT (*) FROM message;" )

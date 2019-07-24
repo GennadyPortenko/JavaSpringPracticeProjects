@@ -10,6 +10,7 @@
     <link rel="stylesheet" th:href="@{/vendor/perfect-scrollbar/css/perfect-scrollbar.css}">
     <script th:src="@{/vendor/jquery/js/jquery.min.js}"></script>
     <script th:src="@{/vendor/perfect-scrollbar/js/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/js/loadPreviousMessages.js}"></script>
     <script th:src="@{/js/longpolling.js}"></script>
     <script th:src="@{/js/sendMessage.js}"></script>
     <script th:src="@{/js/index.js}"></script>
@@ -27,6 +28,7 @@
       <div class="messenger">
         <div class = "messages-container" id="messages-container">
           <div  class="content" id="messages-container-content">
+            <button class="load-previous-messages-btn" id="load-previous-messages-btn">загрузить еще</button>
             <div th:each="message: ${messages}" th:attr = "data-message-id = ${message.id}" class="message-wrapper message-wrapper-left"
                  th:classappend="${message.username} != ${session.username} ? message-wrapper-notme : message-wrapper-me">
                 <span th:if="${message.username} != ${session.username}" th:text="${message.username}" class="username"></span>

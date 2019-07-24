@@ -77,12 +77,25 @@ public class DBTest {
 
     @Test
     @Transactional
-    public void test () {
+    public void testFindTop20Messages () {
         List<Message> topMessages = messageService.findTop20Messages();
 
         int messageIndex = MESSAGES_NUM;
         for (Message topMessage : topMessages) {
             assertEquals(MESSAGE_TEXT + messageIndex--, topMessage.getText());
+        }
+    }
+
+    @Test
+    @Transactional
+    public void testFindTop20ByMessageIdLessThanOrderByMessageId() {
+        final int specificId = 36;
+        List<Message> allMessages = messageService.findAll();
+        List<Message> messages = messageService.findTop20MessagesWIthIdLessThan(allMessages.get(specificId - 1).getMessageId());
+
+        int messageIndex = specificId - 2; // index of message with id = (specifiedId - 1)
+        for (Message message : messages) {
+            assertEquals(message, allMessages.get(messageIndex--));
         }
     }
 

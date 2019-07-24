@@ -1,5 +1,6 @@
 package gpk.practice.spring.bootmvc.controller;
 
+import gpk.practice.spring.bootmvc.dto.IdDto;
 import gpk.practice.spring.bootmvc.dto.LongPollRequest;
 import gpk.practice.spring.bootmvc.dto.MessageDto;
 import gpk.practice.spring.bootmvc.dto.NewMessageDto;
@@ -9,22 +10,21 @@ import gpk.practice.spring.bootmvc.service.DtoService;
 import gpk.practice.spring.bootmvc.service.MessageService;
 import gpk.practice.spring.bootmvc.service.SecurityService;
 import gpk.practice.spring.bootmvc.service.SubscribersManager;
+import jdk.internal.joptsimple.internal.Messages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -47,8 +47,10 @@ public class MainController {
             request.getSession().setAttribute("username", securityService.getCurrentUserName());
         }
         ModelAndView modelAndView = new ModelAndView("index");
-        modelMap.put("messages", messageService.findAll().stream()
-                .map(dtoService::convertToDto).collect(Collectors.toList()));
+        List<MessageDto> messageDtos = messageService.findTop20Messages().stream()
+                                         .map(dtoService::convertToDto).collect(Collectors.toList());
+        Collections.reverse(messageDtos);
+        modelMap.put("messages", messageDtos);
         return modelAndView;
     }
 
@@ -92,6 +94,14 @@ public class MainController {
         lastMessageId.set(savedMessage.getMessageId());
         subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(savedMessage)));
         return new ResponseEntity<>(new Message() /* (empty) */, HttpStatus.OK);
+    }
+
+    @PostMapping(value="/messenger/load_more")
+    public ResponseEntity<?> loadMoreMessages(@RequestBody IdDto idDto) {
+        System.out.println("/messenger/load_more : first message if = " + idDto.getId());
+        List<MessageDto> messages = messageService.findTop20MessagesWIthIdLessThan(idDto.getId())
+                                      .stream().map(dtoService::convertToDto).collect(Collectors.toList());
+        return new ResponseEntity<>(messages, HttpStatus.OK);
     }
 
 }
