@@ -43,5 +43,13 @@ public class MessageService {
     public List<Message> findAllAfterId(long id) {
         return messageRepository.findAll(MessageSpecifications.IdMoreThan(id));
     }
+    public List<Message> findTop20Messages() { return messageRepository.findTop20ByOrderByMessageIdDesc(); }
+    public List<Message> findTop20MessagesWIthIdLessThan(long messageId) {
+        return messageRepository.findTop20ByMessageIdLessThanOrderByMessageIdDesc(messageId);
+    };
     public void deleteAll() { messageRepository.deleteAll(); }
+    public long getNumberOfMessages() { return messageRepository.getNumberOfMessages(); }
+    public long getNumberOfMessagesOfUser(String userName) {
+        return messageRepository.getNumberOfMessagesOfUser(userName);
+    }
 }

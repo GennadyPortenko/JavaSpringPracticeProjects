@@ -9,8 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
@@ -19,6 +23,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Transactional
     public User registerNewUserAccount(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setActive(1);
@@ -33,4 +38,7 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
     public void deleteAll() { userRepository.deleteAll(); }
+    public List<String > getUserNames() {
+        return userRepository.findAll().stream().map(User::getName).collect(toList());
+    }
 }

@@ -6,9 +6,15 @@ function scrollToTheEnd(duration) {
     scrollTop:$("#messages-container")[0].scrollHeight - $(".message").last().height()
   }, duration)
 }
-function addMessages(messages) {
-  $.each(messages, function(k, message) {
-    var messageHtml =
+
+function scrollToTheMiddle(duration) {
+  $("#messages-container").animate({
+    scrollTop:$("#load-previous-messages-btn").offset().top - 100
+  }, duration)
+}
+
+function prepareMessageHtml(message) {
+  var messageHtml =
     '<div data-message-id=' + message.id + ' class="message-wrapper message-wrapper-left ';
     if (current_username_ == message.username) {
       messageHtml += 'message-wrapper-me">';
@@ -32,12 +38,36 @@ function addMessages(messages) {
         });
        messageHtml +=
        '<span class=message>' + message.text + '</span>' +
-     '</div>'
+     '</div>';
 
-    $("#messages-container-content").append(messageHtml);
-    scrollToTheEnd(500);
+     return messageHtml;
+}
+
+function appendMessages(messages) {
+  $.each(messages, function(k, message) {
+    $("#messages-container-content").append(prepareMessageHtml(message));
   });
   bindMessagesToReply();
+}
+
+function prependMessages(messages) {
+  if (messages.length == 0) {
+    $("#load-previous-messages-btn").remove();
+    $("#messages-container-content").prepend(
+      '<div class="no-more-messages-label">Это все сообщения</div>'
+    );
+    return;
+  }
+  $.each(messages, function(k, message) {
+    $("#messages-container-content").prepend(prepareMessageHtml(message));
+  });
+  scrollToTheMiddle(0);
+  $("#load-previous-messages-btn").remove();
+  $("#messages-container-content").prepend(
+    '<button class="load-previous-messages-btn" id="load-previous-messages-btn">загрузить еще</button>'
+  );
+  bindMessagesToReply();
+  bindLoadPreviousMessagesBtn();
 }
 
 function hideMessagesToReplyBlock() {
@@ -47,6 +77,23 @@ function hideMessagesToReplyBlock() {
 function showMessagesToReplyBlock() {
   $('.messages-to-reply').removeClass('hidden');
   $('.message-textarea').addClass('shifted');
+}
+
+function bindLoadPreviousMessagesBtn() {
+  $('#load-previous-messages-btn').click(function() {
+     var data = {};
+     data['id'] = parseInt($(".message-wrapper").first().attr("data-message-id"), 10);
+     loadPreviousMessages(
+         data,
+         function(data) {
+           prependMessages(data);
+         },
+         function() {
+           console.log('error while sending a request for messages request');
+         },
+         hostURL
+     );
+   });
 }
 
 function bindMessagesToReply() {
@@ -122,5 +169,7 @@ $(document).ready(function() {
      }
    });
 
-  longPoll(prepareLongPollRequest, addMessages, hostURL);
+   bindLoadPreviousMessagesBtn();
+
+  longPoll(prepareLongPollRequest, appendMessages, hostURL);
 });

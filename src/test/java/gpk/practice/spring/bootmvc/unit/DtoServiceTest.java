@@ -15,17 +15,19 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-@SpringBootTest
 @RunWith(SpringRunner.class)
+@SpringBootTest
 public class DtoServiceTest {
     private DtoService dtoService;
 
@@ -37,6 +39,10 @@ public class DtoServiceTest {
     @MockBean
     private MessageService messageService;
 
+    @Autowired
+    @Qualifier("messageDateTimeFormatter")
+    private DateTimeFormatter messageDateTimeFormatter;
+
     private final String testUsername = "John";
     private final User testUser = new User("", testUsername, "");
 
@@ -47,16 +53,12 @@ public class DtoServiceTest {
     private boolean initialized = false;
     @Before
     public void init() {
-        if (!initialized) {
             Mockito.when(userService.findByName(testUsername))
                     .thenReturn(testUser);
             Mockito.when(messageService.findById(testMessageId))
                     .thenReturn(testMessage);
 
-            dtoService = new DtoService(modelMapper, userService, messageService);
-
-            initialized = true;
-        }
+            dtoService = new DtoService(modelMapper, userService, messageService, messageDateTimeFormatter);
     }
 
     @Test
@@ -108,7 +110,7 @@ public class DtoServiceTest {
         MessageDto messageDto = dtoService.convertToDto(message);
         assertEquals(messageDto.getId(), message.getMessageId());
         assertEquals(messageDto.getText(), message.getText());
-        assertEquals(messageDto.getDatetime(), message.getDatetime());
+        assertEquals(messageDto.getDatetime(), messageDateTimeFormatter.format(message.getDatetime()));
         assertEquals(messageDto.getUsername(), message.getUser().getName());
         for( int i = 0; i < message.getMessagesToReply().size(); i++ ) {
             assertEquals( messageDto.getMessagesToReply().get(i).getUsername(),

@@ -297,3 +297,18 @@ body {
 .send-message-btn:hover {
   color:white;
 }
+.load-previous-messages-btn {
+  cursor:pointer;
+  color:#ddd;
+  background:transparent;
+  border:none;
+  padding:15px 0;
+}
+.load-previous-messages-btn:hover {
+  color:white;
+}
+.no-more-messages-label {
+  padding:15px 0;
+  color:#777;
+}
+

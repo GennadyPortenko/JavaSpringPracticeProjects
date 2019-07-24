@@ -9,8 +9,10 @@ import gpk.practice.spring.bootmvc.model.User;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +23,8 @@ public class DtoService {
     private final ModelMapper modelMapper;
     private final UserService userService;
     private final MessageService messageService;
+    @Qualifier("messageDateTimeFormatter")
+    private final DateTimeFormatter messageDateTimeFormatter;
 
     public UserDto convertToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
@@ -35,6 +39,7 @@ public class DtoService {
     public MessageDto convertToDto(Message message) {
         MessageDto messageDto = modelMapper.map(message, MessageDto.class);
         messageDto.setUsername(message.getUser().getName());
+        messageDto.setDatetime(messageDateTimeFormatter.format(message.getDatetime()));
         if (message.getMessagesToReply() != null) {
             messageDto.setMessagesToReply(message.getMessagesToReply().stream().
                     map(this::convertToDto).collect(Collectors.toList()));
