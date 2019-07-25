@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
@@ -68,4 +69,18 @@ public class LoginControllerTest {
                 .get("/")
                 .then().statusCode(302);
     }
+
+    @Test
+    @WithMockUser(username="g", password="g", roles="USER")
+    public void givenContext_whenGetIndexAuthenticated_thenReturnsCode200 () {
+        given()
+                .param("username", "g")
+                .param("password", "g")
+                .when().post("/login")
+                .then().statusCode(302);
+        given()
+                .when().get("/")
+                .then().statusCode(200);
+    }
+
 }
