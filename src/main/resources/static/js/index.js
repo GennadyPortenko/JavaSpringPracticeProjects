@@ -19,10 +19,10 @@ function prepareMessageHtml(message) {
     if (current_username_ == message.username) {
       messageHtml += 'message-wrapper-me">';
     } else {
-      messageHtml += 'message-wrapper-notme">' +
-       '<span class="username">' + message.username + '</span>';
+      messageHtml += 'message-wrapper-notme">';
     }
       messageHtml +=
+       '<span class="username">' + message.username + '</span>' +
        '<span class="datetime">' +  message.datetime + '</span>' +
        '<button class="reply-btn">ответить</button>';
         message.messagesToReply.forEach(function(msgToRply, index, array) {
@@ -47,6 +47,7 @@ function appendMessages(messages) {
   $.each(messages, function(k, message) {
     $("#messages-container-content").append(prepareMessageHtml(message));
   });
+  scrollToTheEnd(500);
   bindMessagesToReply();
 }
 

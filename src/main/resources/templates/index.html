@@ -8,6 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.css}">
     <link rel="stylesheet" th:href="@{/vendor/perfect-scrollbar/css/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/vendor/fontawesome-free-5.9.0-web/css/all.css}">
     <script th:src="@{/vendor/jquery/js/jquery.min.js}"></script>
     <script th:src="@{/vendor/perfect-scrollbar/js/perfect-scrollbar.min.js}"></script>
     <script th:src="@{/js/loadPreviousMessages.js}"></script>
@@ -31,9 +32,9 @@
             <button class="load-previous-messages-btn" id="load-previous-messages-btn">загрузить еще</button>
             <div th:each="message: ${messages}" th:attr = "data-message-id = ${message.id}" class="message-wrapper message-wrapper-left"
                  th:classappend="${message.username} != ${session.username} ? message-wrapper-notme : message-wrapper-me">
-                <span th:if="${message.username} != ${session.username}" th:text="${message.username}" class="username"></span>
+                <span th:text="${message.username}" class="username"></span>
                 <span th:text="${message.datetime}" class="datetime"></span>
-                <button class="reply-btn">ответить</button>
+                <button class="reply-btn" title="ответить"><i class="fas fa-reply"></i></button>
                 <div th:each="messageToReply: ${message.messagesToReply}" class="message-to-reply-wrapper">
                     <div class="message-to-reply">
                         <div class="info">

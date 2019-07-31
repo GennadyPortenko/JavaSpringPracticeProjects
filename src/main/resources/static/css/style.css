@@ -33,7 +33,7 @@ body {
 .topbar {
   height:40px;
   display:block;
-  padding:5px 0 30px 0;
+  padding:10px 0 30px 0;
 }
 .topbar-msg {
   font-size:14px;
@@ -56,7 +56,8 @@ body {
 }
 .topbar-login {
   margin-right:10px;
-  color:#ff0;
+  font-size:13px;
+  color:#cc0;
 }
 .login-form {
   overflow:hidden;
@@ -136,7 +137,10 @@ body {
   margin:20px 0;
 }
 .error-msg {
-  color:red;
+  color:white;
+  background:#d00;
+  border-radius:10px;
+  padding:2px;
 }
 
 .error404-msg {
@@ -149,13 +153,15 @@ body {
 }
 
 .help-block.with-errors {
-  margin-top:20px;
-  color:red;
+  margin-top:40px;
+  background:#d00;
+  border-radius:5px;
+  color:white;
   font-size:13px;
 }
 
 .messenger {
-  padding:20px 0;
+  padding:5px 0;
 }
 .messages-container {
   display:none;
@@ -184,9 +190,10 @@ body {
 .messages-container .message {
   background:#151515;
   display:block;
-  padding:10px;
-  padding-left:15px;
+  padding:13px 0px 5px 20px;
   color:#ddd;
+  font-size:12px;
+  line-height:27px;
 }
 .messages-container .message-to-reply-wrapper {
   padding:10px 5px 5px 15px;
@@ -201,15 +208,17 @@ body {
 .messages-container .message-to-reply .text {
   margin:5px 0px 0px 5px;
 }
-.messages-container .message-wrapper-me .message{
-  color:#dff;
-}
 .messages-container .username {
+  border-radius:4px;
   width:auto;
-  background:#444;
-  color:yellow;
-  padding:0px 15px 2px 15px;
+  background:#00a;
+  color:#ddd;
+  padding:2px 8px 2px 8px;
   margin:0px 0px 0px 10px;
+}
+.messages-container .message-wrapper-me .username {
+  background-color:#060;
+  color:white;
 }
 .messages-container .datetime {
   color:#999;
@@ -286,7 +295,7 @@ body {
 .send-message-btn {
   margin:0;
   padding:0;
-  margin-top:17px;
+  margin-top:15px;
   font-size:14px;
   transition:color .2s ease;
   background:black;
