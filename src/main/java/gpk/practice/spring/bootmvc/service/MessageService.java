@@ -23,6 +23,7 @@ public class MessageService {
 
     public Message saveMessage(Message message) {
         message.setDatetime(Instant.now());
+        message.setDeleted(false);
         List<Message> messagesToReply = new ArrayList<>();
         message.getMessagesToReply().forEach(msgToRply ->
             messagesToReply.add(findById(msgToRply.getMessageId()))
@@ -51,5 +52,21 @@ public class MessageService {
     public long getNumberOfMessages() { return messageRepository.getNumberOfMessages(); }
     public long getNumberOfMessagesOfUser(String userName) {
         return messageRepository.getNumberOfMessagesOfUser(userName);
+    }
+    public Message delete(Message message) {
+        try {
+            messageRepository.delete(message);
+        } catch(Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return message;
+    }
+    public Boolean setDeleted(Message message) {
+        message.setDeleted(true);
+        if (messageRepository.save(message) == null) {
+            return false;
+        }
+        return true;
     }
 }

@@ -2,6 +2,7 @@ package gpk.practice.spring.bootmvc.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Data
+@DynamicUpdate
 @NoArgsConstructor
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -25,6 +27,8 @@ public class Message {
     @NonNull
     @NotEmpty
     String text;
+    @NotNull
+    Boolean deleted;
     @NonNull
     @NotNull
     @ManyToOne(fetch=FetchType.LAZY)

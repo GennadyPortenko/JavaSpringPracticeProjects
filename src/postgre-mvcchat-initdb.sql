@@ -15,6 +15,7 @@ CREATE TABLE message (
   message_id BIGSERIAL PRIMARY KEY
 , datetime DATE
 , text TEXT NOT NULL
+, deleted BOOLEAN NOT NULL
 , user_fk INTEGER REFERENCES account(user_id) -- ON UPDATE CASCADE ON DELETE CASCADE
 );
 

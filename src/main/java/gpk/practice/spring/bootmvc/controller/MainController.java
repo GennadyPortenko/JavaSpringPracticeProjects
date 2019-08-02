@@ -1,11 +1,9 @@
 package gpk.practice.spring.bootmvc.controller;
 
-import gpk.practice.spring.bootmvc.dto.IdDto;
-import gpk.practice.spring.bootmvc.dto.LongPollRequest;
-import gpk.practice.spring.bootmvc.dto.MessageDto;
-import gpk.practice.spring.bootmvc.dto.NewMessageDto;
+import gpk.practice.spring.bootmvc.dto.*;
 import gpk.practice.spring.bootmvc.model.LongPollSubscriber;
 import gpk.practice.spring.bootmvc.model.Message;
+import gpk.practice.spring.bootmvc.repository.MessageRepository;
 import gpk.practice.spring.bootmvc.service.DtoService;
 import gpk.practice.spring.bootmvc.service.MessageService;
 import gpk.practice.spring.bootmvc.service.SecurityService;
@@ -37,6 +35,7 @@ public class MainController {
     private final DtoService dtoService;
     private final SubscribersManager subscribersManager;
     private final MessageService messageService;
+    private final MessageRepository messageRepository;
     private AtomicLong lastMessageId = new AtomicLong(-1);
 
     @RequestMapping(value="/")
@@ -59,12 +58,11 @@ public class MainController {
         long clientLastMessageId = request.getLastMessageId();
         //FIXME
         if (this.lastMessageId.get() > clientLastMessageId) {
-            // сразу же вернуть результат с более новыми сообщениями, если они есть
-
-            List<MessageDto> msgs = messageService.findAllAfterId(clientLastMessageId).stream()
+            /* сразу же вернуть результат с более новыми сообщениями, если они есть */
+            List<MessageDto> messages = messageService.findAllAfterId(clientLastMessageId).stream()
                                                 .map(dtoService::convertToDto)
                                                 .collect(Collectors.toList());
-            dr.setResult(new ResponseEntity<>(msgs, HttpStatus.OK));
+            dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_MESSAGES, messages), HttpStatus.OK));
         } else {
             LongPollSubscriber subscriber = new LongPollSubscriber(dr, clientLastMessageId);
             dr.onTimeout(() -> {
@@ -91,7 +89,7 @@ public class MainController {
         }
         /* разослать новое(ые) сообщение(я) всем long-poll подписчикам */
         lastMessageId.set(savedMessage.getMessageId());
-        subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(savedMessage)));
+        subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(savedMessage)), LongPollResponseType.NEW_MESSAGES);
         return new ResponseEntity<>(new Message() /* (empty) */, HttpStatus.OK);
     }
 
@@ -101,6 +99,23 @@ public class MainController {
         List<MessageDto> messages = messageService.findTop20MessagesWIthIdLessThan(idDto.getId())
                                       .stream().map(dtoService::convertToDto).collect(Collectors.toList());
         return new ResponseEntity<>(messages, HttpStatus.OK);
+    }
+
+    @PostMapping(value="/messenger/message/delete/{messageId}")
+    @ResponseBody
+    public ResponseEntity<?> deleteMessage(@PathVariable Integer messageId, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Message messageToSetDeleted = messageService.findById(messageId);
+        if ( (!messageToSetDeleted.getUser().getName().equals(session.getAttribute("username"))) ||
+             (messageToSetDeleted.getDeleted()) ) {
+            System.out.println("no content");
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+        if (!messageService.setDeleted(messageToSetDeleted))  {
+            return new ResponseEntity<>(Arrays.asList(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(messageToSetDeleted)), LongPollResponseType.NEW_DELETED_MESSAGES);
+        return new ResponseEntity<>(Arrays.asList(), HttpStatus.OK);
     }
 
 }

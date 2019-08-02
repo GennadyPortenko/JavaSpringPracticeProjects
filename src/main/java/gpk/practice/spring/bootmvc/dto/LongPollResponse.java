@@ -1,19 +1,19 @@
 package gpk.practice.spring.bootmvc.dto;
 
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LongPollRequest {
+public class LongPollResponse {
     @Getter
     @Setter
-    long lastMessageId;
+    LongPollResponseType type;
     @Getter
     @Setter
-    long lastDeletedMessageId;
+    List<MessageDto> messages;
 }

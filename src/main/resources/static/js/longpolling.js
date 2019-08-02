@@ -1,4 +1,4 @@
-function longPoll(prepareRequestData, processMessages, hostURL) {
+function longPoll(prepareRequestData, processLongPollResponse, hostURL) {
   $.ajax({
     type: "POST",
     contentType: "application/json",
@@ -12,15 +12,15 @@ function longPoll(prepareRequestData, processMessages, hostURL) {
       switch(textStatus) {
         case "success" :
           var messages = JSON.parse(request.responseText);
-          processMessages(messages);
-          longPoll(prepareRequestData, processMessages, hostURL);
+          processLongPollResponse(messages);
+          longPoll(prepareRequestData, processLongPollResponse, hostURL);
           break;
         case "nocontent" :  //  long polling timeout (no new messages available)
           // console.log("no content");
-          longPoll(prepareRequestData, processMessages, hostURL);
+          longPoll(prepareRequestData, processLongPollResponse, hostURL);
           break;
         default :  //  error or server unavailable
-          setTimeout(longPoll(prepareRequestData, processMessages, hostURL), 2000);
+          setTimeout(longPoll(prepareRequestData, processLongPollResponse, hostURL), 2000);
           break;
       }
     }

@@ -1,5 +1,7 @@
 package gpk.practice.spring.bootmvc.service;
 
+import gpk.practice.spring.bootmvc.dto.LongPollResponse;
+import gpk.practice.spring.bootmvc.dto.LongPollResponseType;
 import gpk.practice.spring.bootmvc.dto.MessageDto;
 import gpk.practice.spring.bootmvc.model.LongPollSubscriber;
 import org.springframework.http.HttpStatus;
@@ -25,9 +27,9 @@ public class SubscribersManager {
         removeSubscriber(subscriber);
     }
 
-    public void broadcast(List<MessageDto> messages) {
+    synchronized public void broadcast(List<MessageDto> messages, LongPollResponseType responseType) {
         for (LongPollSubscriber subscriber : subscribers) {
-            subscriber.getResponse().setResult(new ResponseEntity<>(messages, HttpStatus.OK));
+            subscriber.getResponse().setResult(new ResponseEntity<>(new LongPollResponse(responseType, messages), HttpStatus.OK));
             removeSubscriber(subscriber);
         }
     }
