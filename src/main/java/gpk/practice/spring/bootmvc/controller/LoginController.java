@@ -20,6 +20,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.*;
+import java.util.Set;
 
 @Controller
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
@@ -27,6 +29,12 @@ public class LoginController {
     private final UserService userService;
     private final SecurityService securityService;
     private final DtoService dtoService;
+
+    private static Validator validator;
+    static {
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.usingContext().getValidator();
+    }
 
     @GetMapping(value="/registration")
     public ModelAndView registration(ModelMap modelMap) {
@@ -38,29 +46,37 @@ public class LoginController {
     }
 
     @PostMapping(value="/register")
-    public ModelAndView register(@ModelAttribute UserDto userDto, BindingResult bindingResult, ModelMap modelMap) {
+    public ModelAndView register(@ModelAttribute @Valid UserDto userDto, BindingResult bindingResult, ModelMap modelMap) {
         User user = dtoService.convertToUser(userDto);
         ModelAndView modelAndView = new ModelAndView("register");
         modelMap.put("username", securityService.getCurrentUserName());
-        if (bindingResult.hasErrors()) {
+
+        Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
+        // if (bindingResult.hasErrors()) {
+        if ( !violations.isEmpty() ) {
             modelMap.put("registered_f", false);
-            modelMap.put("error_msg", "Ошибка регистрации. Пожалуйста, проверьте правильность заполнения полей.");
+            StringBuilder errorMsg = new StringBuilder("Ошибка регистрации. Пожалуйста, проверьте правильность заполнения полей. ");
+            for (ConstraintViolation<UserDto> violation : violations) {
+                errorMsg.append(violation.getMessage()).append(" ");
+            }
+
+            modelMap.put("error_msg", errorMsg.toString());
+            return modelAndView;
+        }
+        if ( userService.findByName(user.getName()) != null ) {
+            modelMap.put("registered_f", false);
+            modelMap.put("error_msg", "Пользователь с таким логином уже существует");
+            return modelAndView;
+        }
+        if (userService.findByEmail(user.getEmail()) != null ) {
+            modelMap.put("registered_f", false);
+            modelMap.put("error_msg", "Пользователь с таким email уже существует");
             return modelAndView;
         }
         try {
-            User userFoundByLogin = userService.findByName(user.getName());
-            User userFoundByEmail = userService.findByEmail(user.getEmail());
-            if ( userFoundByLogin != null ) {
-                modelMap.put("registered_f", false);
-                modelMap.put("error_msg", "Пользователь с таким логином уже существует");
-            } else if (userFoundByEmail != null ) {
-                modelMap.put("registered_f", false);
-                modelMap.put("error_msg", "Пользователь с таким email уже существует");
-            } else {
-                userService.registerNewUserAccount(user);
-                modelMap.put("registered_f", true);
-                modelMap.put("username", user.getName());
-            }
+            userService.registerNewUserAccount(user);
+            modelMap.put("registered_f", true);
+            modelMap.put("username", user.getName());
         } catch (Exception /* NonUniqueResultException */ e) {
             modelMap.put("registered_f", false);
             modelMap.put("error_msg", "Ошибка регистрации.");

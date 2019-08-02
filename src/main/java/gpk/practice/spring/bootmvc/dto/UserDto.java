@@ -1,5 +1,6 @@
 package gpk.practice.spring.bootmvc.dto;
 
+import gpk.practice.spring.bootmvc.validation.constraint.ValidEmail;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +16,7 @@ import javax.validation.constraints.NotEmpty;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDto {
     @NotEmpty
-    @Email
+    @ValidEmail
     String email;
     @NotEmpty
     String name;

@@ -1,6 +1,13 @@
 // var hostURL = "http://localhost:8080"
 var hostURL = "https://spring-mvc-chat.herokuapp.com";
 
+var messageMenuCurrentMessage = null;
+
+function showInfoMessage(infoMessage) {
+  $('#info-modal-message').text(infoMessage);
+  $('#info-modal').modal('show');
+}
+
 function scrollToTheEnd(duration) {
   $("#messages-container").animate({
     scrollTop:$("#messages-container")[0].scrollHeight - $(".message").last().height()
@@ -19,35 +26,76 @@ function prepareMessageHtml(message) {
     if (current_username_ == message.username) {
       messageHtml += 'message-wrapper-me">';
     } else {
-      messageHtml += 'message-wrapper-notme">' +
-       '<span class="username">' + message.username + '</span>';
+      messageHtml += 'message-wrapper-notme">';
     }
       messageHtml +=
-       '<span class="datetime">' +  message.datetime + '</span>' +
-       '<button class="reply-btn">ответить</button>';
-        message.messagesToReply.forEach(function(msgToRply, index, array) {
+       '<span class="username">' + message.username + '</span>' +
+       '<span class="datetime">' +  message.datetime + '</span>';
+       if (!message.deleted) {
+         if (current_username_ == message.username) {
+           messageHtml += '<button class="msg-menu-btn"><i class="fas fa-ellipsis-h"></i></button>';
+         } else {
+           messageHtml += '<button class="reply-btn" title="ответить"><i class="fas fa-reply"></i></button>';
+         }
+       }
+       message.messagesToReply.forEach(function(msgToRply, index, array) {
          messageHtml += '<div class="message-to-reply-wrapper">' +
                           '<div class="message-to-reply">' +
                             '<div class="info">' +
                               '<span>' + msgToRply.username + '</span> писал :' +
-                            '</div>' +
-                            '<div class="text">' + msgToRply.text + '</div>' +
+                            '</div>';
+         if (msgToRply.deleted)  {
+           messageHtml += '<span class="text message-deleted">сообщение удалено</span>';
+         } else {
+           messageHtml += '<span class="text">' + msgToRply.text + '</span>';
+         }
+         messageHtml +=
                           '</div>' +
                           '</div>';
 
         });
-       messageHtml +=
-       '<span class=message>' + message.text + '</span>' +
+       if (message.deleted)  {
+         messageHtml += '<span class="message message-deleted">сообщение удалено</span>';
+       } else {
+         messageHtml += '<span class="message">' + message.text + '</span>';
+       }
+     messageHtml +=
      '</div>';
 
      return messageHtml;
 }
 
 function appendMessages(messages) {
+  if (messages.length == 0) {
+    return;
+  }
   $.each(messages, function(k, message) {
     $("#messages-container-content").append(prepareMessageHtml(message));
   });
-  bindMessagesToReply();
+  $('#load-previous-messages-btn').removeClass('hidden');
+  $('#no-messages-yet').addClass('hidden');
+  scrollToTheEnd(500);
+  bindMessagesActions();
+}
+
+function processDeletedMessages(messages) {
+  if (messages.length == 0) {
+    return;
+  }
+  $.each(messages, function(k, message) {
+    $(".message-wrapper[data-message-id='" + message.id + "']").each(function(j, frontMessage) {
+      $(frontMessage).find('.message').text('сообщение удалено');
+      $(frontMessage).find('.message').addClass('message-deleted');
+    });
+  });
+}
+
+function processLongPollResponse(response) {
+  if (response.type == 'NEW_MESSAGES') {
+    appendMessages(response.messages);
+  } else if (response.type == 'NEW_DELETED_MESSAGES') {
+    processDeletedMessages(response.messages);
+  }
 }
 
 function prependMessages(messages) {
@@ -66,7 +114,7 @@ function prependMessages(messages) {
   $("#messages-container-content").prepend(
     '<button class="load-previous-messages-btn" id="load-previous-messages-btn">загрузить еще</button>'
   );
-  bindMessagesToReply();
+  bindMessagesActions();
   bindLoadPreviousMessagesBtn();
 }
 
@@ -96,8 +144,21 @@ function bindLoadPreviousMessagesBtn() {
    });
 }
 
-function bindMessagesToReply() {
+function bindMessagesActions() {
   $('.reply-btn').click( function() { addMessageToReply( $(this).parent() ); } );
+  $('.msg-menu-btn').click( function() {
+    messageMenuCurrentMessage = $(this).parent();
+    $('.message-menu-msg-text').remove();
+    $('#message-menu-content').prepend('<div class="message-menu-msg-text">' + messageMenuCurrentMessage.find('.message').text() + '</div>');
+    if (messageMenuCurrentMessage.children('.message-deleted').length != 0) {
+      $('.message-menu-delete-btn').hide()
+      $('.message-menu-modify-btn').hide()
+    } else {
+      $('.message-menu-delete-btn').show()
+      $('.message-menu-modify-btn').show()
+    }
+    $('#message-menu-modal').modal('show');
+  });
   $('.message-to-reply > .close').click(function() {
     $(this).parent().remove();
     if ( $('.messages-to-reply').children().length == 0 ) {
@@ -124,7 +185,12 @@ function addMessageToReply(message) {
                            '<span class="text">' + message.find('.message').text() + '</span>'
   $('#messages-to-reply').append(messageToReply)
   showMessagesToReplyBlock();
-  bindMessagesToReply();
+  bindMessagesActions();
+}
+
+function activateMessageMenu(message) {
+  $('#message-menu-content').find('.message-menu-msg-text').remove();
+  $('#message-menu-content').prepend('<div class="message-menu-msg-text">' + messageMenuCurrentMessage.find('.message').text() + '</div>')
 }
 
 function prepareLongPollRequest() {
@@ -133,7 +199,35 @@ function prepareLongPollRequest() {
   return requestData;
 }
 
+function initMessageMenuModal() {
+  $('.message-menu-reply-btn').click(function() {
+    addMessageToReply( messageMenuCurrentMessage );
+    $('#message-menu-modal').modal('hide');
+  });
+  $('.message-menu-delete-btn').click(function() {
+    $('#message-menu-modal').modal('hide');
+    deleteMessage(messageMenuCurrentMessage.attr("data-message-id"),
+            function() {
+              console.log('message deleted')
+              messageMenuCurrentMessage.find(".message").text('сообщение удалено');
+              messageMenuCurrentMessage.find(".message").addClass('message-deleted')
+              messageMenuCurrentMessage.find(".msg-menu-btn").remove();
+            },
+            function() {
+              console.log('error while message deleting!');
+              showInfoMessage('Ошибка. Сообщение не удалено.');
+            },
+            function() {
+              console.log('message is already deleted!');
+              showInfoMessage('Сообщение уже удалено.');
+            },
+            hostURL
+    );
+  });
+}
+
 $(document).ready(function() {
+   initMessageMenuModal();
 
    initCustomScrollbar('#messages-container');
    $('#messages-container').show();
@@ -141,7 +235,7 @@ $(document).ready(function() {
    $('#message-textarea').show();
    scrollToTheEnd(0);
 
-   bindMessagesToReply();
+   bindMessagesActions();
 
    $('#send-message-btn').click(function() {
      var message = {}
@@ -171,5 +265,5 @@ $(document).ready(function() {
 
    bindLoadPreviousMessagesBtn();
 
-  longPoll(prepareLongPollRequest, appendMessages, hostURL);
+  longPoll(prepareLongPollRequest, processLongPollResponse, hostURL);
 });

@@ -103,6 +103,7 @@ public class DtoServiceTest {
     public void testMessageToMessageDtoMapping() {
         Message message = new Message();
         message.setMessageId(1L);
+        message.setDeleted(true);
         message.setText("Test message text");
         message.setDatetime(Instant.now());
         message.setUser(testUser);
@@ -110,6 +111,7 @@ public class DtoServiceTest {
         MessageDto messageDto = dtoService.convertToDto(message);
         assertEquals(messageDto.getId(), message.getMessageId());
         assertEquals(messageDto.getText(), message.getText());
+        assertEquals(messageDto.getDeleted(), message.getDeleted());
         assertEquals(messageDto.getDatetime(), messageDateTimeFormatter.format(message.getDatetime()));
         assertEquals(messageDto.getUsername(), message.getUser().getName());
         for( int i = 0; i < message.getMessagesToReply().size(); i++ ) {

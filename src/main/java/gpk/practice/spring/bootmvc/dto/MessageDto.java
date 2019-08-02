@@ -15,5 +15,6 @@ public class MessageDto {
     String datetime;
     String text;
     String username;
+    Boolean deleted;
     List<MessageDto> MessagesToReply;
 }

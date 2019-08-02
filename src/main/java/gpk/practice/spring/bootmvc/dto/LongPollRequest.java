@@ -13,4 +13,7 @@ public class LongPollRequest {
     @Getter
     @Setter
     long lastMessageId;
+    @Getter
+    @Setter
+    long lastDeletedMessageId;
 }

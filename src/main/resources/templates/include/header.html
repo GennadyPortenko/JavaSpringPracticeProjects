@@ -7,7 +7,6 @@
                 <a th:href="@{/registration}" class="topbar-link topbar-link-small">регистрация</a>
             </span>
             <span th:case="*">
-                <span class="topbar-msg">Вы вошли как</span>
                 <span th:text="${session.username}" class="topbar-login"></span>
                 <a th:href="@{/logout}" class="topbar-link topbar-small">выйти</a>
             </span>

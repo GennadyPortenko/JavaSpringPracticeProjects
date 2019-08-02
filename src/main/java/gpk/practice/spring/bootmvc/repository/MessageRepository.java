@@ -13,6 +13,7 @@ import java.util.Set;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpecificationExecutor<Message> {
     Message findById(long id);
+    Message findByText(String text);
     Set<Message> findByUser(User user);
 
     List<Message> findTop20ByOrderByMessageIdDesc();

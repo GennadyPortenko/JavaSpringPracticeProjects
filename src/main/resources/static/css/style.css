@@ -33,7 +33,7 @@ body {
 .topbar {
   height:40px;
   display:block;
-  padding:5px 0 30px 0;
+  padding:10px 0 30px 0;
 }
 .topbar-msg {
   font-size:14px;
@@ -56,7 +56,8 @@ body {
 }
 .topbar-login {
   margin-right:10px;
-  color:#ff0;
+  font-size:13px;
+  color:#cc0;
 }
 .login-form {
   overflow:hidden;
@@ -136,7 +137,10 @@ body {
   margin:20px 0;
 }
 .error-msg {
-  color:red;
+  color:white;
+  background:#d00;
+  border-radius:10px;
+  padding:2px;
 }
 
 .error404-msg {
@@ -149,24 +153,27 @@ body {
 }
 
 .help-block.with-errors {
-  margin-top:20px;
-  color:red;
+  margin-top:40px;
+  background:#d00;
+  border-radius:5px;
+  color:white;
   font-size:13px;
 }
 
 .messenger {
-  padding:20px 0;
+  padding:5px 0;
 }
 .messages-container {
   display:none;
   font-size:12px;
   position: relative;
   overflow: auto;
-  height:calc(100vh - 270px);
+  height:calc(100vh - 200px);
   border:1px solid #444;
   padding:10px 0px;
 }
 .messages-container .content {
+  position:relative;
   padding-right:5px;
 }
 .messages-container .message-wrapper {
@@ -184,9 +191,13 @@ body {
 .messages-container .message {
   background:#151515;
   display:block;
-  padding:10px;
-  padding-left:15px;
+  padding:13px 0px 5px 20px;
   color:#ddd;
+  font-size:12px;
+  line-height:27px;
+}
+.messages-container .message-deleted {
+  color:#777;
 }
 .messages-container .message-to-reply-wrapper {
   padding:10px 5px 5px 15px;
@@ -196,20 +207,25 @@ body {
   padding:5px;
   width:auto;
   border-radius:5px;
-  background:#00a;
+  background:#00b;
 }
 .messages-container .message-to-reply .text {
   margin:5px 0px 0px 5px;
 }
-.messages-container .message-wrapper-me .message{
-  color:#dff;
+.messages-container .message-to-reply .text.message-deleted {
+  color:#999;
 }
 .messages-container .username {
+  border-radius:4px;
   width:auto;
-  background:#444;
-  color:yellow;
-  padding:0px 15px 2px 15px;
+  background:#00a;
+  color:#ddd;
+  padding:2px 8px 2px 8px;
   margin:0px 0px 0px 10px;
+}
+.messages-container .message-wrapper-me .username {
+  background-color:#060;
+  color:white;
 }
 .messages-container .datetime {
   color:#999;
@@ -220,8 +236,23 @@ body {
   background:transparent;
   border:none;
   cursor:pointer;
+  margin-left:5px;
 }
 .messages-container .reply-btn:hover {
+  color:white;
+}
+.messages-container .msg-menu-btn {
+  color:#ddd;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  border:1px solid #888;
+  margin-left:5px;
+  border-radius:3px;
+  padding:3px;
+  line-height:0;
+}
+.messages-container .msg-menu-btn:hover {
   color:white;
 }
 .message-textarea-wrapper {
@@ -231,12 +262,13 @@ body {
 .message-textarea {
   display:none;
   overflow: auto;
-  height:120px;
+  height:80px;
   resize:none;
   background:black;
   border:1px solid #666;
   width:100%;
   font-size:14px;
+  line-height:20px;
   color:#ddd;
   padding:10px 20px;
 }
@@ -286,7 +318,7 @@ body {
 .send-message-btn {
   margin:0;
   padding:0;
-  margin-top:17px;
+  margin-top:15px;
   font-size:14px;
   transition:color .2s ease;
   background:black;
@@ -302,7 +334,10 @@ body {
   color:#ddd;
   background:transparent;
   border:none;
-  padding:15px 0;
+  padding:10px 0;
+}
+.load-previous-messages-btn.hidden {
+  display:none;
 }
 .load-previous-messages-btn:hover {
   color:white;
@@ -310,5 +345,73 @@ body {
 .no-more-messages-label {
   padding:15px 0;
   color:#777;
+}
+.no-more-messages-label.hidden {
+  display:none;
+}
+
+.message-menu-msg-text {
+  text-align:center;
+  color:#aaa;
+  padding:5px 15px;
+  height:30px;
+  text-overflow:ellipsis;
+  overflow:hidden;
+  white-space:nowrap;
+  font-size:12px;
+  border:1px solid #555;
+  border-radius:5px;
+}
+.message-menu-btn {
+  width:100%;
+  background:transparent;
+  color:#ddd;
+  border:none;
+  font-size:13px;
+  margin-top:12px;
+  display:block;
+}
+.message-menu-btn:active,
+.message-menu-btn:focus {
+  outline:none;
+}
+.message-menu-btn:hover {
+  color:white;
+}
+
+.modal-content {
+  border:1px solid #555 !important;
+}
+.modal-header {
+  background:black;
+  border:none !important;
+}
+.modal-body {
+  background:black;
+  border:none !important;
+}
+#message-menu-modal .modal-dialog {
+    -webkit-transform: translate(0,-50%);
+    -o-transform: translate(0,-50%);
+    transform: translate(0,-50%);
+    top: 50%;
+    margin: 0 auto;
+}
+
+#info-modal .modal-dialog {
+    -webkit-transform: translate(0,-50%);
+    -o-transform: translate(0,-50%);
+    transform: translate(0,-50%);
+    top: 50%;
+    margin: 0 auto;
+}
+#info-modal {
+  text-align:center;
+}
+#info-modal-message {
+  color:#ddd;
+  font-size:12px;
+  margin-bottom:20px;
+  padding:0 10px;
 }
 
