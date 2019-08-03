@@ -86,6 +86,7 @@ function processDeletedMessages(messages) {
     $(".message-wrapper[data-message-id='" + message.id + "']").each(function(j, frontMessage) {
       $(frontMessage).find('.message').text('сообщение удалено');
       $(frontMessage).find('.message').addClass('message-deleted');
+      $(frontMessage).find(".msg-menu-btn").remove();
     });
   });
 }
@@ -209,9 +210,6 @@ function initMessageMenuModal() {
     deleteMessage(messageMenuCurrentMessage.attr("data-message-id"),
             function() {
               console.log('message deleted')
-              messageMenuCurrentMessage.find(".message").text('сообщение удалено');
-              messageMenuCurrentMessage.find(".message").addClass('message-deleted')
-              messageMenuCurrentMessage.find(".msg-menu-btn").remove();
             },
             function() {
               console.log('error while message deleting!');

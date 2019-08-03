@@ -13,7 +13,7 @@ import java.util.List;
 
 @Entity
 @Data
-// @DynamicUpdate // deletetion - setDeleted(); JpaRepository.save()
+@DynamicUpdate
 @NoArgsConstructor
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
