@@ -7,7 +7,7 @@ function longPoll(prepareRequestData, processLongPollResponse, hostURL) {
     dataType: "json",
     mimeType: 'application/json',
     cache: false,
-    // timeout: 600000,
+    timeout: 4000,
     complete: function(request, textStatus){
       switch(textStatus) {
         case "success" :
