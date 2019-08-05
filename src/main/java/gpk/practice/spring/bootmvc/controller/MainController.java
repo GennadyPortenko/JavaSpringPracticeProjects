@@ -53,6 +53,7 @@ public class MainController {
     }
 
     @PostMapping(value="/messenger/poll")
+    @CrossOrigin(origins="${host.url}", allowedHeaders = "*")
     public DeferredResult<ResponseEntity<?>> processLongPoll(@RequestBody LongPollRequest request) {
         DeferredResult<ResponseEntity<?>> dr = new DeferredResult<>(LONG_POLL_TIMEOUT.longValue());
         long clientLastMessageId = request.getLastMessageId();
