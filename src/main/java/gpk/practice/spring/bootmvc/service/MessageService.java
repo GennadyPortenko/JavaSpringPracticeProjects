@@ -23,7 +23,7 @@ public class MessageService {
 
     public Message saveMessage(Message message) {
         message.setDatetime(Instant.now());
-        message.setDeleted(false);
+        message.setDeleted(null);
         List<Message> messagesToReply = new ArrayList<>();
         message.getMessagesToReply().forEach(msgToRply ->
             messagesToReply.add(findById(msgToRply.getMessageId()))
@@ -63,7 +63,7 @@ public class MessageService {
         return message;
     }
     public Boolean setDeleted(Message message) {
-        message.setDeleted(true);
+        message.setDeleted(Instant.now());
         if (messageRepository.save(message) == null) {
             return false;
         }

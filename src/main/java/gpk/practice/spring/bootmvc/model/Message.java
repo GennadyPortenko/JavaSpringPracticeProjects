@@ -1,5 +1,6 @@
 package gpk.practice.spring.bootmvc.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.DynamicUpdate;
@@ -13,10 +14,11 @@ import java.util.List;
 
 @Entity
 @Data
-// @DynamicUpdate // deletetion - setDeleted(); JpaRepository.save()
+@DynamicUpdate // deletion - setDeleted(); JpaRepository.save()
 @NoArgsConstructor
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@EqualsAndHashCode(exclude = {"messagesToReply"})
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,16 +29,16 @@ public class Message {
     @NonNull
     @NotEmpty
     String text;
-    @NotNull
-    Boolean deleted;
+    Instant deleted;
     @NonNull
     @NotNull
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="user_fk")
     User user;
+    @ToString.Exclude
     @NonNull
     @ManyToMany( cascade = { CascadeType.PERSIST, CascadeType.MERGE },
                  targetEntity = gpk.practice.spring.bootmvc.model.Message.class)
     @JoinTable(name = "message_message_to_reply", joinColumns = @JoinColumn(name = "message_id"), inverseJoinColumns = @JoinColumn(name = "message_to_reply_id"))
-    List<Message> MessagesToReply = new ArrayList<>();
+    List<Message> messagesToReply = new ArrayList<>();
 }

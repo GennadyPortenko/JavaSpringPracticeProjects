@@ -31,7 +31,7 @@ function prepareMessageHtml(message) {
       messageHtml +=
        '<span class="username">' + message.username + '</span>' +
        '<span class="datetime">' +  message.datetime + '</span>';
-       if (!message.deleted) {
+       if (message.deleted == null) {
          if (current_username_ == message.username) {
            messageHtml += '<button class="msg-menu-btn"><i class="fas fa-ellipsis-h"></i></button>';
          } else {
@@ -44,7 +44,7 @@ function prepareMessageHtml(message) {
                             '<div class="info">' +
                               '<span>' + msgToRply.username + '</span> писал :' +
                             '</div>';
-         if (msgToRply.deleted)  {
+         if (msgToRply.deleted != null)  {
            messageHtml += '<span class="text message-deleted">сообщение удалено</span>';
          } else {
            messageHtml += '<span class="text">' + msgToRply.text + '</span>';
@@ -54,7 +54,7 @@ function prepareMessageHtml(message) {
                           '</div>';
 
         });
-       if (message.deleted)  {
+       if (message.deleted != null)  {
          messageHtml += '<span class="message message-deleted">сообщение удалено</span>';
        } else {
          messageHtml += '<span class="message">' + message.text + '</span>';
@@ -79,13 +79,12 @@ function appendMessages(messages) {
 }
 
 function processDeletedMessages(messages) {
-  if (messages.length == 0) {
-    return;
-  }
+  lastDeletedMessageId = messages[Object.keys(messages).length-1].id;
   $.each(messages, function(k, message) {
     $(".message-wrapper[data-message-id='" + message.id + "']").each(function(j, frontMessage) {
       $(frontMessage).find('.message').text('сообщение удалено');
       $(frontMessage).find('.message').addClass('message-deleted');
+      $(frontMessage).find(".msg-menu-btn").remove();
     });
   });
 }
@@ -195,7 +194,9 @@ function activateMessageMenu(message) {
 
 function prepareLongPollRequest() {
   var requestData = {};
+  requestData['firstMessageId'] = parseInt($(".message-wrapper").first().attr("data-message-id"), 10);
   requestData['lastMessageId'] = parseInt($(".message-wrapper").last().attr("data-message-id"), 10);
+  requestData['lastDeletedMessageId'] = lastDeletedMessageId;
   return requestData;
 }
 
@@ -209,9 +210,6 @@ function initMessageMenuModal() {
     deleteMessage(messageMenuCurrentMessage.attr("data-message-id"),
             function() {
               console.log('message deleted')
-              messageMenuCurrentMessage.find(".message").text('сообщение удалено');
-              messageMenuCurrentMessage.find(".message").addClass('message-deleted')
-              messageMenuCurrentMessage.find(".msg-menu-btn").remove();
             },
             function() {
               console.log('error while message deleting!');

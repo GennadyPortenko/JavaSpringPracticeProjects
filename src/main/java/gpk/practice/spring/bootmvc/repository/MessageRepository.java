@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +27,12 @@ public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpec
     @Query( nativeQuery = true,
             value= "SELECT COUNT (*) FROM message WHERE user_fk = (SELECT user_id FROM account WHERE name = ?1);" )
     long getNumberOfMessagesOfUser(String userName);
+
+    List<Message> findByDeletedGreaterThanEqual(Instant deleted);
+
+    @Query( nativeQuery = true,
+            value= "SELECT * FROM message WHERE deleted IS NOT NULL ORDER BY deleted DESC limit 1;" )
+    Message findTopDeleted();
 
     void deleteAll();
 }

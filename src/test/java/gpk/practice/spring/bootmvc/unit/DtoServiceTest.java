@@ -50,7 +50,6 @@ public class DtoServiceTest {
     private final String testMessageText = "test message text";
     private final Message testMessage = new Message(Instant.now(), testMessageText, testUser);
 
-    private boolean initialized = false;
     @Before
     public void init() {
             Mockito.when(userService.findByName(testUsername))
@@ -103,7 +102,7 @@ public class DtoServiceTest {
     public void testMessageToMessageDtoMapping() {
         Message message = new Message();
         message.setMessageId(1L);
-        message.setDeleted(true);
+        message.setDeleted(Instant.now());
         message.setText("Test message text");
         message.setDatetime(Instant.now());
         message.setUser(testUser);

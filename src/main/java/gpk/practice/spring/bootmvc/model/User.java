@@ -1,5 +1,6 @@
 package gpk.practice.spring.bootmvc.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -15,6 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Table(name = "account")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@EqualsAndHashCode(exclude = {"messages"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,9 +32,11 @@ public class User {
     @NotEmpty
     String password;
     int active;
+    @ToString.Exclude
     @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     Set<Role> roles = new HashSet<>();
+    @ToString.Exclude
     @OneToMany(fetch=FetchType.LAZY, mappedBy="user")
     Set<Message> messages = new HashSet<>();
 }

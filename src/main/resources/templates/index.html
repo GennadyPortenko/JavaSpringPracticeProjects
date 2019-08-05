@@ -22,6 +22,7 @@
     <script th:inline="javascript">
       /*<![CDATA[*/
         var current_username_ = /*[[${session.username}]]*/ null;
+        var lastDeletedMessageId = /*[[${lastDeletedMessageId}]]*/ null;
       /*]]>*/
     </script>
 </head>
@@ -40,19 +41,20 @@
                  th:classappend="${message.username} != ${session.username} ? message-wrapper-notme : message-wrapper-me">
                 <span th:text="${message.username}" class="username"></span>
                 <span th:text="${message.datetime}" class="datetime"></span>
-                <button th:if="(${session.username} == ${message.username}) and (not ${message.deleted})" class="msg-menu-btn"><i class="fas fa-ellipsis-h"></i></button>
-                <button th:if="(${session.username} != ${message.username}) and (${not message.deleted})" class="reply-btn" title="ответить"><i class="fas fa-reply"></i></button>
+                <button th:if="(${session.username} == ${message.username}) and (${message.deleted} == null)" class="msg-menu-btn"><i class="fas fa-ellipsis-h"></i></button>
+                <button th:if="(${session.username} != ${message.username}) and (${message.deleted} == null)" class="reply-btn" title="ответить"><i class="fas fa-reply"></i></button>
                 <div th:each="messageToReply: ${message.messagesToReply}" class="message-to-reply-wrapper">
                     <div class="message-to-reply">
                         <div class="info">
                             <span th:text="${messageToReply.username}"></span> писал :
                         </div>
-                        <span th:if="${not messageToReply.deleted}" th:text=="${messageToReply.text}" class="text"></span>
-                        <span th:if="${messageToReply.deleted}" class="text message-deleted">сообщение удалено</span>
+                        <span th:if="${messageToReply.deleted} == null" th:text=="${messageToReply.text}" class="text"></span>
+                        <span th:if="${messageToReply.deleted} != null" class="text message-deleted">сообщение удалено</span>
                     </div>
                 </div>
-                <span th:if="${not message.deleted}" th:text=="${message.text}" class="message"></span>
-                <span th:if="${message.deleted}" class="message message-deleted">сообщение удалено</span>
+                <span th:if="${message.deleted} == null" th:text=="${message.text}" class="message"></span>
+                <!-- <span th:if="${message.deleted} != null" class="message message-deleted">сообщение удалено</span> -->
+                <span th:if="${message.deleted} != null" th:text="${message.deleted}" class="message message-deleted">сообщение удалено</span>
             </div>
           </div>
         </div>

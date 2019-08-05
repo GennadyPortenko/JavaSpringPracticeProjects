@@ -4,12 +4,14 @@ import gpk.practice.spring.bootmvc.App;
 import gpk.practice.spring.bootmvc.configuration.AppConfig;
 import gpk.practice.spring.bootmvc.configuration.DBTestProfileConfig;
 import gpk.practice.spring.bootmvc.configuration.SecurityConfig;
+import gpk.practice.spring.bootmvc.dto.MessageDto;
 import gpk.practice.spring.bootmvc.model.Message;
 import gpk.practice.spring.bootmvc.model.User;
 import gpk.practice.spring.bootmvc.repository.MessageRepository;
 import gpk.practice.spring.bootmvc.repository.RoleRepository;
 import gpk.practice.spring.bootmvc.service.MessageService;
 import gpk.practice.spring.bootmvc.service.UserService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,9 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static junit.framework.TestCase.assertNull;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
@@ -57,29 +57,32 @@ public class DBTest {
         userService.deleteAll();
     }
 
-    private static boolean dbInitialized = false;
+    private void addMessages() {
+        List<Message> messages = new ArrayList<>();
+        for (int i = 1; i <= MESSAGES_NUM; i++) {
+            messages.add(new Message(Instant.now(), MESSAGE_TEXT + i, userService.findByName(John.getName())));
+        }
+        messages.forEach(messageService::saveMessage);
+    }
+
     @Before
     public void init() {
+        cleanDB();
 
-        if (!dbInitialized) {
-            cleanDB();
+        final List<User> users = Arrays.asList( John, Bill );
+        users.forEach(user -> userService.registerNewUserAccount(user));
+    }
 
-            List<User> users = Arrays.asList( John, Bill );
-            users.forEach(user -> userService.registerNewUserAccount(user));
-
-            List<Message> messages = new ArrayList<>();
-            for (int i = 1; i <= MESSAGES_NUM; i++) {
-                messages.add(new Message(Instant.now(), MESSAGE_TEXT + i, userService.findByName(John.getName())));
-            }
-            messages.forEach(messageService::saveMessage);
-
-            dbInitialized = true;
-        }
+    @After
+    @Test
+    public void clean() {
+        cleanDB();
     }
 
     @Test
     @Transactional
     public void testFindTop20Messages () {
+        addMessages();
         List<Message> topMessages = messageService.findTop20Messages();
 
         int messageIndex = MESSAGES_NUM;
@@ -93,6 +96,7 @@ public class DBTest {
     @Rollback(false)
     // TODO : без @Rollback(false) удаляются записи из бд
     public void testFindTop20ByMessageIdLessThanOrderByMessageId() {
+        addMessages();
         final int specificId = 36;
         List<Message> allMessages = messageService.findAll();
         List<Message> messages = messageService.findTop20MessagesWIthIdLessThan(allMessages.get(specificId - 1).getMessageId());
@@ -120,15 +124,43 @@ public class DBTest {
         final String MESSAGE_TO_SET_DELETED_TEXT = "message to set deleted";
 
         messageService.saveMessage(new Message(Instant.now(), MESSAGE_TO_SET_DELETED_TEXT, userService.findByName("John")));
-        assertEquals(messageRepository.findByText(MESSAGE_TO_SET_DELETED_TEXT).getDeleted(), false);
+        assertNull(messageRepository.findByText(MESSAGE_TO_SET_DELETED_TEXT).getDeleted());
         messageService.setDeleted(messageRepository.findByText(MESSAGE_TO_SET_DELETED_TEXT));
-        assertEquals(messageRepository.findByText(MESSAGE_TO_SET_DELETED_TEXT).getDeleted(), true);
+        assertNotNull(messageRepository.findByText(MESSAGE_TO_SET_DELETED_TEXT).getDeleted());
     }
 
 
     @Test
-    public void last() {
-        cleanDB();
+    @Transactional
+    public void testFindMessagesAfterDatetime() {
+        addMessages();
+        List<Integer> deletedMessagesIds = Arrays.asList(4, 15, 6, 12, 8, 10);
+        List<Message> messages = messageRepository.findTop20ByOrderByMessageIdDesc();
+        for (int deletedMessagesId : deletedMessagesIds) {
+            messageService.setDeleted(messages.get(deletedMessagesId));
+            try {
+                Thread.sleep(1L);
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+        List<Message> deletedMessages = messageRepository.findByDeletedGreaterThanEqual(messages.get(deletedMessagesIds.get(2)).getDeleted());
+        assertEquals(deletedMessagesIds.size() - 2, deletedMessages.size());
+    }
+
+    @Test
+    @Transactional
+    public void testFindTopDeletedMessage() {
+        List<Message> messages = Arrays.asList(
+                new Message(Instant.now(), MESSAGE_TEXT + 1, userService.findByName(John.getName())),
+                new Message(Instant.now(), MESSAGE_TEXT + 2, userService.findByName(John.getName())),
+                new Message(Instant.now(), MESSAGE_TEXT + 3, userService.findByName(John.getName()))
+        );
+        messages.forEach(messageService::saveMessage);
+
+        List<Message> messagesFromDB = messageRepository.findAll();
+        messageService.setDeleted(messagesFromDB.get(2));
+        messageService.setDeleted(messagesFromDB.get(1));
+
+        assertEquals(messagesFromDB.get(1).getMessageId(), messageRepository.findTopDeleted().getMessageId());
     }
 
 }
