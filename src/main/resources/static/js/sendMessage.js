@@ -1,5 +1,5 @@
 function sendMessage(requestData, onSuccess, onError, hostURL) {
-  console.log("sending message : " + requestData["text"]);
+  console.log("sending message : '" + requestData["text"] + "'");
   $.ajax({
     type: "POST",
     contentType: "application/json",

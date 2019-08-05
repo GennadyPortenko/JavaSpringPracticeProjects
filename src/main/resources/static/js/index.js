@@ -239,19 +239,21 @@ $(document).ready(function() {
 
    $('#send-message-btn').click(function() {
      var message = {}
-     message['text'] = $('#message-textarea').val();
+     var messageText = $('#message-textarea').val();
+     if (messageText.trim() == '') {
+       return;
+     }
+     message['text'] = messageText;
      message.messagesToReply = [];
      $('.messages-to-reply').children().each(function(index) {
          messageToReply = {}
          messageToReply['id'] = $(this).attr('data-message-id');
          message.messagesToReply.push(messageToReply);
      })
-     if (message['text'] != '') {
-       $('#message-textarea').val('');
-       sendMessage(message, function() {  },
-                            function() {  },
-                             hostURL);
-     }
+     $('#message-textarea').val('');
+     sendMessage(message, function() {  },
+                          function() {  },
+                           hostURL);
      $('.messages-to-reply').empty();
      hideMessagesToReplyBlock();
    });
