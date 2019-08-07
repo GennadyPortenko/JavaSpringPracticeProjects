@@ -39,22 +39,27 @@
                  class="no-more-messages-label" id="no-messages-yet">сообщений пока нет</div>
             <div th:each="message: ${messages}" th:attr = "data-message-id = ${message.id}" class="message-wrapper message-wrapper-left"
                  th:classappend="${message.username} != ${session.username} ? message-wrapper-notme : message-wrapper-me">
-                <span th:text="${message.username}" class="username"></span>
-                <span th:text="${message.datetime}" class="datetime"></span>
-                <button th:if="(${session.username} == ${message.username}) and (${message.deleted} == null)" class="msg-menu-btn"><i class="fas fa-ellipsis-h"></i></button>
-                <button th:if="(${session.username} != ${message.username}) and (${message.deleted} == null)" class="reply-btn" title="ответить"><i class="fas fa-reply"></i></button>
+                <div class="message-bar">
+                    <span th:text="${message.username}" class="username"></span>
+                    <span th:text="${message.datetime}" class="datetime"></span>
+                    <button th:if="(${session.username} == ${message.username}) and (${message.deleted} == null)" class="msg-menu-btn"><i class="fas fa-ellipsis-h"></i></button>
+                    <button th:if="(${session.username} != ${message.username}) and (${message.deleted} == null)" class="reply-btn" title="ответить"><i class="fas fa-level-up-alt"></i></button>
+                </div>
                 <div th:each="messageToReply: ${message.messagesToReply}" class="message-to-reply-wrapper">
                     <div class="message-to-reply">
-                        <div class="info">
-                            <span th:text="${messageToReply.username}"></span> писал :
+                        <div class="icon"><i class="fas fa-level-down-alt"></i></div>
+                        <div class="name">
+                            <span th:text="${messageToReply.username}"></span>
+                        </div>
+                        <div class="datetime">
+                            <span th:text="${messageToReply.datetime}"></span>
                         </div>
                         <span th:if="${messageToReply.deleted} == null" th:text=="${messageToReply.text}" class="text"></span>
                         <span th:if="${messageToReply.deleted} != null" class="text message-deleted">сообщение удалено</span>
                     </div>
                 </div>
                 <span th:if="${message.deleted} == null" th:text=="${message.text}" class="message"></span>
-                <!-- <span th:if="${message.deleted} != null" class="message message-deleted">сообщение удалено</span> -->
-                <span th:if="${message.deleted} != null" th:text="${message.deleted}" class="message message-deleted">сообщение удалено</span>
+                <span th:if="${message.deleted} != null" class="message message-deleted">сообщение удалено</span>
             </div>
           </div>
         </div>

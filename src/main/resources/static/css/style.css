@@ -56,8 +56,11 @@ body {
 }
 .topbar-login {
   margin-right:10px;
-  font-size:13px;
-  color:#cc0;
+  font-size:12px;
+  color:white;
+  background-color:#060;
+  border-radius:5px;
+  padding:5px;
 }
 .login-form {
   overflow:hidden;
@@ -177,7 +180,7 @@ body {
   padding-right:5px;
 }
 .messages-container .message-wrapper {
-  background:#151515;
+  /* background:#151515; */
   text-align:left;
   padding:5px 10px 5px 0px;
   margin-bottom:5px;
@@ -189,47 +192,103 @@ body {
   text-align:left;
 }
 .messages-container .message {
-  background:#151515;
-  display:block;
-  padding:13px 0px 5px 20px;
+  background:#00b;
   color:#ddd;
+  max-width:calc(100% - 50px);
+  margin:10px 25px;
+  display:inline-block;
+  padding:0px 15px;
   font-size:12px;
   line-height:27px;
+  border-radius:10px;
+  position:relative;
+}
+.messages-container .message:before {
+  content:"";
+  position:absolute;
+  left:-7px;
+  top:0px;
+  width: 0px;
+  height: 0;
+  border-bottom: 12px solid transparent;
+  border-left: 5px solid transparent;
+  border-top: 12px solid #00b; /* #00b */
+  border-right: 5px solid #00b;
+}
+.messages-container .message:after{
+  content:"";
+  position:absolute;
+  left:-7px;
+  top:0px;
+  width: 0px;
+  height: 0;
+  border-bottom: 2px solid transparent;
+  border-left: 5px solid transparent;
+  border-top: 2px solid black; /* #00b */
+  border-right: 5px solid black;
 }
 .messages-container .message-deleted {
-  color:#777;
+  color:#eee;
+  font-size:11px;
+  background:transparent;
+}
+.messages-container .message-deleted:before{
+  display:none;
+  padding:0;
+}
+.messages-container .message-deleted:after {
+  display:none;
 }
 .messages-container .message-to-reply-wrapper {
   padding:10px 5px 5px 15px;
 }
 .messages-container .message-to-reply {
+  max-width:calc(100% - 20px);
+  position:relative;
   display:inline-block;
-  padding:5px;
+  padding:3px 10px 3px 25px;
   width:auto;
   border-radius:5px;
-  background:#00b;
+  background:#000095;
+}
+.messages-container .message-to-reply-wrapper .icon {
+  position:absolute;
+  top:8px;
+  left:8px;
+  fnot-size:12px;
+  color:#ccc;
+}
+.messages-container .message-to-reply .name {
+  color:white;
+  margin:3px 0;
+}
+.messages-container .message-to-reply .datetime {
+  color:#ccc;
+  margin:3px 3px 6px 0;
 }
 .messages-container .message-to-reply .text {
-  margin:5px 0px 0px 5px;
+  margin-top:5px;
+  line-height:23px;
 }
 .messages-container .message-to-reply .text.message-deleted {
   color:#999;
 }
 .messages-container .username {
   border-radius:4px;
-  width:auto;
-  background:#00a;
-  color:#ddd;
-  padding:2px 8px 2px 8px;
+  color:white;
+  padding:1px 0;
   margin:0px 0px 0px 10px;
 }
 .messages-container .message-wrapper-me .username {
   background-color:#060;
-  color:white;
+  margin-left:16px;
+  padding-left:8px;
+  padding-right:8px;
 }
 .messages-container .datetime {
-  color:#999;
-  margin-left:10px;
+  color:#ddd;
+  font-size:11px;
+  margin-left:4px;
 }
 .messages-container .reply-btn {
   color:#ddd;
@@ -249,7 +308,7 @@ body {
   border:1px solid #888;
   margin-left:5px;
   border-radius:3px;
-  padding:3px;
+  padding:1px 7px;
   line-height:0;
 }
 .messages-container .msg-menu-btn:hover {
