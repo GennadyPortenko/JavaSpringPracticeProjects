@@ -29,20 +29,26 @@ function prepareMessageHtml(message) {
       messageHtml += 'message-wrapper-notme">';
     }
       messageHtml +=
+       '<div class="message-bar">' +
        '<span class="username">' + message.username + '</span>' +
        '<span class="datetime">' +  message.datetime + '</span>';
        if (message.deleted == null) {
          if (current_username_ == message.username) {
            messageHtml += '<button class="msg-menu-btn"><i class="fas fa-ellipsis-h"></i></button>';
          } else {
-           messageHtml += '<button class="reply-btn" title="ответить"><i class="fas fa-reply"></i></button>';
+           messageHtml += '<button class="reply-btn" title="ответить"><i class="fas fa-level-up-alt"></i></button>';
          }
        }
+       messageHtml += '</div>';
        message.messagesToReply.forEach(function(msgToRply, index, array) {
          messageHtml += '<div class="message-to-reply-wrapper">' +
                           '<div class="message-to-reply">' +
-                            '<div class="info">' +
-                              '<span>' + msgToRply.username + '</span> писал :' +
+                            '<div class="icon"><i class="fas fa-level-down-alt"></i></div>' +
+                            '<div class="name">' +
+                              '<span>' + msgToRply.username + '</span>' +
+                            '</div>' +
+                            '<div class="datetime">' +
+                              '<span>' + msgToRply.datetime+ '</span>' +
                             '</div>';
          if (msgToRply.deleted != null)  {
            messageHtml += '<span class="text message-deleted">сообщение удалено</span>';
@@ -144,9 +150,9 @@ function bindLoadPreviousMessagesBtn() {
 }
 
 function bindMessagesActions() {
-  $('.reply-btn').click( function() { addMessageToReply( $(this).parent() ); } );
+  $('.reply-btn').click( function() { addMessageToReply( $(this).parent().parent() ); } );
   $('.msg-menu-btn').click( function() {
-    messageMenuCurrentMessage = $(this).parent();
+    messageMenuCurrentMessage = $(this).parent().parent();
     $('.message-menu-msg-text').remove();
     $('#message-menu-content').prepend('<div class="message-menu-msg-text">' + messageMenuCurrentMessage.find('.message').text() + '</div>');
     if (messageMenuCurrentMessage.children('.message-deleted').length != 0) {
