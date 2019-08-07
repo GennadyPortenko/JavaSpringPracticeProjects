@@ -132,6 +132,7 @@ body {
   background:black;
   border:none;
   font-size:13px;
+  margin-bottom:8px;
 }
 .login-form-submit:hover {
   color:white;
@@ -231,6 +232,7 @@ body {
   color:#eee;
   font-size:11px;
   background:transparent;
+  padding-left:0;
 }
 .messages-container .message-deleted:before{
   display:none;
@@ -277,11 +279,10 @@ body {
   border-radius:4px;
   color:white;
   padding:1px 0;
-  margin:0px 0px 0px 10px;
+  margin:0px 0px 0px 16px;
 }
 .messages-container .message-wrapper-me .username {
   background-color:#060;
-  margin-left:16px;
   padding-left:8px;
   padding-right:8px;
 }
@@ -438,8 +439,12 @@ body {
   color:white;
 }
 
+.modal-dialog {
+  width:400px !important;
+}
 .modal-content {
   border:1px solid #555 !important;
+    width:200px;
 }
 .modal-header {
   background:black;
@@ -472,5 +477,39 @@ body {
   font-size:12px;
   margin-bottom:20px;
   padding:0 10px;
+}
+
+@media (max-width:539px) {
+  .modal-dialog {
+    max-width:90%;
+  }
+  .login-form {
+    width:90%;
+    margin-left:5%;
+  }
+  .login-form-input {
+    width:80%;
+  }
+  .login-form-title {
+    font-size:12.5px;
+  }
+}
+@media (max-width:450px) {
+  .messages-container .username {
+    display:inline-block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    max-width:85px;
+    margin-bottom:-6px;
+  }
+  .topbar-login {
+    display:inline-block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    max-width:90px;
+    margin-bottom:-12px;
+  }
 }
 
