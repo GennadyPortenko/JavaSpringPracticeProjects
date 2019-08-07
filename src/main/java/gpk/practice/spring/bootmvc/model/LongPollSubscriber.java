@@ -14,7 +14,4 @@ public class LongPollSubscriber {
     @Getter
     @Setter
     DeferredResult<ResponseEntity<?>> response;
-    @Getter
-    @Setter
-    long lastMessageId;
 }
