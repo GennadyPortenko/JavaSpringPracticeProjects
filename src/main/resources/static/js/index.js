@@ -31,7 +31,7 @@ function prepareMessageHtml(message) {
       messageHtml +=
        '<span class="username">' + message.username + '</span>' +
        '<span class="datetime">' +  message.datetime + '</span>';
-       if (!message.deleted) {
+       if (message.deleted == null) {
          if (current_username_ == message.username) {
            messageHtml += '<button class="msg-menu-btn"><i class="fas fa-ellipsis-h"></i></button>';
          } else {
@@ -44,7 +44,7 @@ function prepareMessageHtml(message) {
                             '<div class="info">' +
                               '<span>' + msgToRply.username + '</span> писал :' +
                             '</div>';
-         if (msgToRply.deleted)  {
+         if (msgToRply.deleted != null)  {
            messageHtml += '<span class="text message-deleted">сообщение удалено</span>';
          } else {
            messageHtml += '<span class="text">' + msgToRply.text + '</span>';
@@ -54,7 +54,7 @@ function prepareMessageHtml(message) {
                           '</div>';
 
         });
-       if (message.deleted)  {
+       if (message.deleted != null)  {
          messageHtml += '<span class="message message-deleted">сообщение удалено</span>';
        } else {
          messageHtml += '<span class="message">' + message.text + '</span>';
@@ -79,9 +79,7 @@ function appendMessages(messages) {
 }
 
 function processDeletedMessages(messages) {
-  if (messages.length == 0) {
-    return;
-  }
+  lastDeletedMessageId = messages[Object.keys(messages).length-1].id;
   $.each(messages, function(k, message) {
     $(".message-wrapper[data-message-id='" + message.id + "']").each(function(j, frontMessage) {
       $(frontMessage).find('.message').text('сообщение удалено');
@@ -196,7 +194,9 @@ function activateMessageMenu(message) {
 
 function prepareLongPollRequest() {
   var requestData = {};
+  requestData['firstMessageId'] = parseInt($(".message-wrapper").first().attr("data-message-id"), 10);
   requestData['lastMessageId'] = parseInt($(".message-wrapper").last().attr("data-message-id"), 10);
+  requestData['lastDeletedMessageId'] = lastDeletedMessageId;
   return requestData;
 }
 
@@ -237,19 +237,21 @@ $(document).ready(function() {
 
    $('#send-message-btn').click(function() {
      var message = {}
-     message['text'] = $('#message-textarea').val();
+     var messageText = $('#message-textarea').val();
+     if (messageText.trim() == '') {
+       return;
+     }
+     message['text'] = messageText;
      message.messagesToReply = [];
      $('.messages-to-reply').children().each(function(index) {
          messageToReply = {}
          messageToReply['id'] = $(this).attr('data-message-id');
          message.messagesToReply.push(messageToReply);
      })
-     if (message['text'] != '') {
-       $('#message-textarea').val('');
-       sendMessage(message, function() {  },
-                            function() {  },
-                             hostURL);
-     }
+     $('#message-textarea').val('');
+     sendMessage(message, function() {  },
+                          function() {  },
+                           hostURL);
      $('.messages-to-reply').empty();
      hideMessagesToReplyBlock();
    });

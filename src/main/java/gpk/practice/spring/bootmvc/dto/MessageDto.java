@@ -3,6 +3,7 @@ package gpk.practice.spring.bootmvc.dto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.util.List;
 
 @NoArgsConstructor
@@ -15,6 +16,6 @@ public class MessageDto {
     String datetime;
     String text;
     String username;
-    Boolean deleted;
+    Instant deleted;
     List<MessageDto> MessagesToReply;
 }
