@@ -22,7 +22,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
@@ -68,26 +67,29 @@ public class MainController {
         Long clientLastMessageId = request.getLastMessageId();
         Long clientLastDeletedMessageId = request.getLastDeletedMessageId();
         /* сразу же вернуть результат с более новыми сообщениями, если они есть */
-        if (this.lastMessageId.get() > clientLastMessageId) {
-            List<MessageDto> messages = messageService.findAllAfterId(clientLastMessageId).stream()
-                    .map(dtoService::convertToDto)
-                    .collect(Collectors.toList());
-            dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_MESSAGES, messages), HttpStatus.OK));
-            return dr;
+        long lastMessageId = this.lastMessageId.get();
+        if ( (lastMessageId != -1) && (clientLastMessageId != null)) {
+            if (lastMessageId > clientLastMessageId) {
+                List<MessageDto> messages = messageService.findAllAfterId(clientLastMessageId).stream()
+                        .map(dtoService::convertToDto)
+                        .collect(Collectors.toList());
+                dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_MESSAGES, messages), HttpStatus.OK));
+                return dr;
+            }
         }
         /* сразу же вернуть результат с более новыми удаленными сообщениями, если они есть */
-        long lastDeleted = lastDeletedMessageId.get();
-        if ((clientLastDeletedMessageId != null) && (lastDeleted >= 0)) {
-            if (lastDeleted != clientLastDeletedMessageId) {
+        long lastDeletedMessageId = this.lastDeletedMessageId.get();
+        if ((clientLastDeletedMessageId != null) && (lastDeletedMessageId != -1)) {
+            if (lastDeletedMessageId != clientLastDeletedMessageId) {
                 Instant clientLastDeletedMessageTime = messageService.findById(clientLastDeletedMessageId).getDatetime();
-                if (messageService.findById(lastDeleted).getDatetime().compareTo(clientLastDeletedMessageTime) > 0) {
+                if (messageService.findById(lastDeletedMessageId).getDatetime().compareTo(clientLastDeletedMessageTime) > 0) {
                     List<MessageDto> newDeletedMessages = messageRepository.findByDeletedGreaterThanEqual(clientLastDeletedMessageTime).stream().map(dtoService::convertToDto).collect(Collectors.toList());
                     dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_DELETED_MESSAGES, newDeletedMessages), HttpStatus.OK));
                     return dr;
                 }
             }
         }
-        LongPollSubscriber subscriber = new LongPollSubscriber(dr, clientLastMessageId);
+        LongPollSubscriber subscriber = new LongPollSubscriber(dr);
         dr.onTimeout(() -> {
             /* послать по таймауту ответ за ajax-запрос с HTTP статусом NO_CONTENT*/
             subscribersManager.abortSubscriber(subscriber);
