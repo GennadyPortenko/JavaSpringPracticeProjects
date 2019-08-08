@@ -66,7 +66,7 @@ public class MainController {
         DeferredResult<ResponseEntity<?>> dr = new DeferredResult<>(LONG_POLL_TIMEOUT.longValue());
         Long clientLastMessageId = request.getLastMessageId();
         Long clientLastDeletedMessageId = request.getLastDeletedMessageId();
-        /* сразу же вернуть результат с более новыми сообщениями, если они есть */
+        /* вернуть результат с более новыми сообщениями, если они есть */
         long lastMessageId = this.lastMessageId.get();
         if ( (lastMessageId != -1) && (clientLastMessageId != null)) {
             if (lastMessageId > clientLastMessageId) {
@@ -77,7 +77,7 @@ public class MainController {
                 return dr;
             }
         }
-        /* сразу же вернуть результат с более новыми удаленными сообщениями, если они есть */
+        /* вернуть результат с более новыми удаленными сообщениями, если они есть */
         long lastDeletedMessageId = this.lastDeletedMessageId.get();
         if ((clientLastDeletedMessageId != null) && (lastDeletedMessageId != -1)) {
             if (lastDeletedMessageId != clientLastDeletedMessageId) {
@@ -114,7 +114,10 @@ public class MainController {
         }
         /* разослать новое(ые) сообщение(я) всем long-poll подписчикам */
         lastMessageId.set(savedMessage.getMessageId());
-        subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(savedMessage)), LongPollResponseType.NEW_MESSAGES);
+
+        // subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(savedMessage)), LongPollResponseType.NEW_MESSAGES);
+        subscribersManager.abortSubscribers();
+
         return new ResponseEntity<>(new Message() /* (empty) */, HttpStatus.OK);
     }
 
@@ -139,7 +142,10 @@ public class MainController {
         }
 
         lastDeletedMessageId.set(messageToDelete.getMessageId());
-        subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(messageToDelete)), LongPollResponseType.NEW_DELETED_MESSAGES);
+
+        // subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(messageToDelete)), LongPollResponseType.NEW_DELETED_MESSAGES);
+        subscribersManager.abortSubscribers();
+
         return new ResponseEntity<>(Arrays.asList(), HttpStatus.OK);
     }
 

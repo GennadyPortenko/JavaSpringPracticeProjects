@@ -26,6 +26,11 @@ public class SubscribersManager {
         subscriber.getResponse().setResult(new ResponseEntity<>(HttpStatus.NO_CONTENT));
         removeSubscriber(subscriber);
     }
+    public void abortSubscribers() {
+        for (LongPollSubscriber subscriber : subscribers) {
+            abortSubscriber(subscriber);
+        }
+    }
 
     synchronized public void broadcast(List<MessageDto> messages, LongPollResponseType responseType) {
         for (LongPollSubscriber subscriber : subscribers) {
