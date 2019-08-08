@@ -110,7 +110,7 @@ public class MainController {
         }
 
         if (savedMessage == null) {
-            return new ResponseEntity<>(new Message(), HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new Message(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         /* разослать новое(ые) сообщение(я) всем long-poll подписчикам */
         lastMessageId.set(savedMessage.getMessageId());
