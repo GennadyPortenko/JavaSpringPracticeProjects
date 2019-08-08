@@ -81,8 +81,8 @@ public class MainController {
         long lastDeletedMessageId = this.lastDeletedMessageId.get();
         if ((clientLastDeletedMessageId != null) && (lastDeletedMessageId != -1)) {
             if (lastDeletedMessageId != clientLastDeletedMessageId) {
-                Instant clientLastDeletedMessageTime = messageService.findById(clientLastDeletedMessageId).getDatetime();
-                if (messageService.findById(lastDeletedMessageId).getDatetime().compareTo(clientLastDeletedMessageTime) > 0) {
+                Instant clientLastDeletedMessageTime = messageService.findById(clientLastDeletedMessageId).getDeleted();
+                if (messageService.findById(lastDeletedMessageId).getDeleted().compareTo(clientLastDeletedMessageTime) > 0) {
                     List<MessageDto> newDeletedMessages = messageRepository.findByDeletedGreaterThanEqual(clientLastDeletedMessageTime).stream().map(dtoService::convertToDto).collect(Collectors.toList());
                     dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_DELETED_MESSAGES, newDeletedMessages), HttpStatus.OK));
                     return dr;
