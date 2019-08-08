@@ -10,6 +10,9 @@ function sendMessage(requestData, onSuccess, onError, hostURL) {
     success: function(data, textStatus, response) {
       onSuccess(data);
     },
+    nocontent: function() {
+      console.log("sendMessage() : no content!")
+    },
     error: function(response, textStatus, errorThrown) {
       onError();
     }
