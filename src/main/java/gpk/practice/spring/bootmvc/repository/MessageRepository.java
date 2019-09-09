@@ -29,10 +29,15 @@ public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpec
     long getNumberOfMessagesOfUser(String userName);
 
     List<Message> findByDeletedGreaterThanEqual(Instant deleted);
+    List<Message> findByModifiedGreaterThanEqual(Instant modified);
 
     @Query( nativeQuery = true,
             value= "SELECT * FROM message WHERE deleted IS NOT NULL ORDER BY deleted DESC limit 1;" )
     Message findTopDeleted();
+
+    @Query( nativeQuery = true,
+            value= "SELECT * FROM message WHERE modified IS NOT NULL ORDER BY modified DESC limit 1;" )
+    Message findTopModified();
 
     void deleteAll();
 }

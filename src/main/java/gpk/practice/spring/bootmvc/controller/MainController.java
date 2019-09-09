@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.Instant;
@@ -32,7 +33,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class MainController {
-    @Qualifier("messageDateTimeFormatter")
+    @Qualifier
+    ("messageDateTimeFormatter")
     private final DateTimeFormatter messageDateTimeFormatter;
     @Value("${longpoll.timeout}")
     private Integer LONG_POLL_TIMEOUT;
@@ -41,8 +43,22 @@ public class MainController {
     private final SubscribersManager subscribersManager;
     private final MessageService messageService;
     private final MessageRepository messageRepository;
+
     private AtomicLong lastMessageId = new AtomicLong(-1);
     private AtomicLong lastDeletedMessageId = new AtomicLong(-1);
+    private AtomicLong lastModifiedMessageId = new AtomicLong(-1);
+
+    @PostConstruct
+    public void init() {
+        Message topDeleted = messageRepository.findTopDeleted();
+        if (topDeleted != null) {
+            lastDeletedMessageId.set(topDeleted.getMessageId());
+        }
+        Message topModified = messageRepository.findTopModified();
+        if (topModified != null) {
+            lastModifiedMessageId.set(topModified.getMessageId());
+        }
+    }
 
     @RequestMapping(value="/")
     public ModelAndView messenger(HttpServletRequest request, ModelMap modelMap) {
@@ -57,6 +73,8 @@ public class MainController {
         modelMap.put("messages", messageDtos);
         Message lastDeleted = messageRepository.findTopDeleted();
         modelMap.put("lastDeletedMessageId", lastDeleted == null ? null : lastDeleted.getMessageId());
+        Message lastModified = messageRepository.findTopModified();
+        modelMap.put("lastModifiedMessageId", lastModified == null ? null : lastModified.getMessageId());
         return modelAndView;
     }
 
@@ -66,6 +84,7 @@ public class MainController {
         DeferredResult<ResponseEntity<?>> dr = new DeferredResult<>(LONG_POLL_TIMEOUT.longValue());
         Long clientLastMessageId = request.getLastMessageId();
         Long clientLastDeletedMessageId = request.getLastDeletedMessageId();
+        Long clientLastModifiedMessageId = request.getLastModifiedMessageId();
         /* вернуть результат с более новыми сообщениями, если они есть */
         long lastMessageId = this.lastMessageId.get();
         if ( (lastMessageId != -1) && (clientLastMessageId != null)) {
@@ -77,9 +96,31 @@ public class MainController {
                 return dr;
             }
         }
+        /* вернуть результат с более новыми измененными сообщениями, если они есть */
+        long lastModifiedMessageId = this.lastModifiedMessageId.get();
+        if (lastModifiedMessageId != -1L) {
+            if ((clientLastModifiedMessageId == null) || (clientLastModifiedMessageId < 0)) {
+                List<MessageDto> newModifiedMessages = Arrays.asList(dtoService.convertToDto(messageService.findById(lastModifiedMessageId)));
+                dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_MODIFIED_MESSAGES, newModifiedMessages), HttpStatus.OK));
+                return dr;
+            }
+            if (lastModifiedMessageId != clientLastModifiedMessageId) {
+                Instant clientLastModifiedMessageTime = messageService.findById(clientLastModifiedMessageId).getModified();
+                if (messageService.findById(lastModifiedMessageId).getModified().compareTo(clientLastModifiedMessageTime) > 0) {
+                    List<MessageDto> newModifiedMessages = messageRepository.findByModifiedGreaterThanEqual(clientLastModifiedMessageTime).stream().map(dtoService::convertToDto).collect(Collectors.toList());
+                    dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_MODIFIED_MESSAGES, newModifiedMessages), HttpStatus.OK));
+                    return dr;
+                }
+            }
+        }
         /* вернуть результат с более новыми удаленными сообщениями, если они есть */
         long lastDeletedMessageId = this.lastDeletedMessageId.get();
-        if ((clientLastDeletedMessageId != null) && (lastDeletedMessageId != -1)) {
+        if (lastDeletedMessageId != -1L) {
+            if ((clientLastDeletedMessageId == null) || (clientLastDeletedMessageId < 0)) {
+                List<MessageDto> newDeletedMessages = Arrays.asList(dtoService.convertToDto(messageService.findById(lastDeletedMessageId)));
+                dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_DELETED_MESSAGES, newDeletedMessages), HttpStatus.OK));
+                return dr;
+            }
             if (lastDeletedMessageId != clientLastDeletedMessageId) {
                 Instant clientLastDeletedMessageTime = messageService.findById(clientLastDeletedMessageId).getDeleted();
                 if (messageService.findById(lastDeletedMessageId).getDeleted().compareTo(clientLastDeletedMessageTime) > 0) {
@@ -112,13 +153,27 @@ public class MainController {
         if (savedMessage == null) {
             return new ResponseEntity<>(new Message(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        /* разослать новое(ые) сообщение(я) всем long-poll подписчикам */
         lastMessageId.set(savedMessage.getMessageId());
-
-        // subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(savedMessage)), LongPollResponseType.NEW_MESSAGES);
+        /* отправить ответ на все Long Poll запросы с NO_CONTENT, чтобы клиент сразу же отправил новый запрос и стянул изменения */
         subscribersManager.abortSubscribers();
-
         return new ResponseEntity<>(new Message() /* (empty) */, HttpStatus.OK);
+    }
+
+    @PostMapping(value="/messenger/message/modify")
+    @ResponseBody
+    public ResponseEntity<?> deleteMessage(@RequestBody MessageDto messageDto, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Message messageToModify = messageService.findById(messageDto.getId());
+        if ( (!messageToModify.getUser().getName().equals(session.getAttribute("username"))) ) {
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+        if (!messageService.setModified(messageToModify, messageDto.getText()))  {
+            return new ResponseEntity<>(Arrays.asList(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        lastModifiedMessageId.set(messageToModify.getMessageId());
+        /* отправить ответ на все Long Poll запросы с NO_CONTENT, чтобы клиент сразу же отправил новый запрос и стянул изменения */
+        subscribersManager.abortSubscribers();
+        return new ResponseEntity<>(Arrays.asList(), HttpStatus.OK);
     }
 
     @PostMapping(value="/messenger/load_more")
@@ -140,12 +195,9 @@ public class MainController {
         if (!messageService.setDeleted(messageToDelete))  {
             return new ResponseEntity<>(Arrays.asList(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         lastDeletedMessageId.set(messageToDelete.getMessageId());
-
-        // subscribersManager.broadcast(Arrays.asList(dtoService.convertToDto(messageToDelete)), LongPollResponseType.NEW_DELETED_MESSAGES);
+        /* отправить ответ на все Long Poll запросы с NO_CONTENT, чтобы клиент сразу же отправил новый запрос и стянул изменения */
         subscribersManager.abortSubscribers();
-
         return new ResponseEntity<>(Arrays.asList(), HttpStatus.OK);
     }
 
