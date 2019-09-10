@@ -30,6 +30,7 @@ public class Message {
     @NotEmpty
     String text;
     Instant deleted;
+    Instant modified;
     @NonNull
     @NotNull
     @ManyToOne(fetch=FetchType.LAZY)

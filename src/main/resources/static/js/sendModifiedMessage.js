@@ -1,10 +1,10 @@
-function deleteMessage(/* requestData, */ messageId, onSuccess, onError, onNocontent, hostURL) {
-  console.log("sending message delete request: " + messageId);
+function sendModifiedMessage(requestData, onSuccess, onError, onNocontent, hostURL) {
+  console.log("sending message : '" + requestData["text"] + "'");
   $.ajax({
     type: "POST",
     contentType: "application/json",
-    url: hostURL + "/messenger/message/delete/" + messageId,
-    data: {},
+    url: hostURL + "/messenger/message/modify",
+    data: JSON.stringify(requestData),
     dataType: "json",
     cache: false,
     complete: function(response, textStatus){
@@ -12,7 +12,7 @@ function deleteMessage(/* requestData, */ messageId, onSuccess, onError, onNocon
         case "success" :
           onSuccess()
           break;
-        case "nocontent" : // message is already set as deleted
+        case "nocontent" :
           onNocontent();
           break;
         default :

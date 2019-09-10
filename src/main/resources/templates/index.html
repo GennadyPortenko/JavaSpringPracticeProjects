@@ -16,6 +16,7 @@
     <script th:src="@{/js/longpolling.js}"></script>
     <script th:src="@{/js/sendMessage.js}"></script>
     <script th:src="@{/js/deleteMessage.js}"></script>
+    <script th:src="@{/js/sendModifiedMessage.js}"></script>
     <script th:src="@{/js/index.js}"></script>
     <script th:src="@{/js/initCustomScrollbar.js}"></script>
 
@@ -23,6 +24,7 @@
       /*<![CDATA[*/
         var current_username_ = /*[[${session.username}]]*/ null;
         var lastDeletedMessageId = /*[[${lastDeletedMessageId}]]*/ null;
+        var lastModifiedMessageId = /*[[${lastModifiedMessageId}]]*/ null;
       /*]]>*/
     </script>
 </head>
@@ -58,8 +60,9 @@
                         <span th:if="${messageToReply.deleted} != null" class="text message-deleted">сообщение удалено</span>
                     </div>
                 </div>
-                <span th:if="${message.deleted} == null" th:text=="${message.text}" class="message"></span>
+                <span th:if="${message.deleted} == null" th:text=="${message.text}" class="message" th:classappend="${message.modified} == null ? not-modified : modified"></span>
                 <span th:if="${message.deleted} != null" class="message message-deleted">сообщение удалено</span>
+                <i th:if="${message.modified} != null" class="message-modified-icon fas fa-pencil-alt"></i>
             </div>
           </div>
         </div>
@@ -80,10 +83,10 @@
             <div class="modal-body">
               <div id="message-menu-content">
                 <div class="message-menu-msg-text"></div>
-                <button class="message-menu-btn message-menu-reply-btn">ответить</button>
-                <button class="message-menu-btn message-menu-delete-btn">удалить</button>
-                <button class="message-menu-btn message-menu-modify-btn">изменить</button>
-                <button class="message-menu-btn" data-dismiss="modal">закрыть</button>
+                <button class="message-menu-btn message-menu-reply-btn">[О]тветить</button>
+                <button class="message-menu-btn message-menu-delete-btn">[У]далить</button>
+                <button class="message-menu-btn message-menu-modify-btn">[И]зменить</button>
+                <button class="message-menu-btn" data-dismiss="modal">[З]акрыть</button>
               </div>
             </div>
         </div>
@@ -95,10 +98,26 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="info-message" id="info-modal-message"></div>
-                <button class="message-menu-btn" data-dismiss="modal">закрыть</button>
+                <button class="message-menu-btn" data-dismiss="modal">[З]акрыть</button>
             </div>
         </div>
     </div>
+  </div>
+
+  <div class="modal" id="modify-modal">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-body">
+                  <div class = "modify-message-textarea-wrapper">
+                     <div class="content" id="modify-modal-content">
+                       <textarea class = "modify-message-textarea" id="modify-message-textarea"></textarea>
+                     </div>
+                  </div>
+                  <button class="message-menu-btn" id="modify-message-send-btn" data-dismiss="modal">[О]править</button>
+                  <button class="message-menu-btn" data-dismiss="modal">[З]акрыть</button>
+              </div>
+          </div>
+      </div>
   </div>
 
 </body>

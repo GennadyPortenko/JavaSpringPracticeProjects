@@ -17,5 +17,6 @@ public class MessageDto {
     String text;
     String username;
     Instant deleted;
+    Instant modified;
     List<MessageDto> MessagesToReply;
 }

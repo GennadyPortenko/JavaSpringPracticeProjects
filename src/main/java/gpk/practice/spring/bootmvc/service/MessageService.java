@@ -24,6 +24,7 @@ public class MessageService {
     public Message saveMessage(Message message) {
         message.setDatetime(Instant.now());
         message.setDeleted(null);
+        message.setModified(null);
         List<Message> messagesToReply = new ArrayList<>();
         message.getMessagesToReply().forEach(msgToRply ->
             messagesToReply.add(findById(msgToRply.getMessageId()))
@@ -62,6 +63,7 @@ public class MessageService {
         }
         return message;
     }
+
     public Boolean setDeleted(Message message) {
         message.setDeleted(Instant.now());
         if (messageRepository.save(message) == null) {
@@ -69,4 +71,14 @@ public class MessageService {
         }
         return true;
     }
+
+    public Boolean setModified(Message message, String newText) {
+        message.setModified(Instant.now());
+        message.setText(newText);
+        if (messageRepository.save(message) == null) {
+            return false;
+        }
+        return true;
+    }
+
 }

@@ -63,10 +63,19 @@ function prepareMessageHtml(message) {
        if (message.deleted != null)  {
          messageHtml += '<span class="message message-deleted">сообщение удалено</span>';
        } else {
-         messageHtml += '<span class="message">' + message.text + '</span>';
+         messageHtml += '<span class="message';
+         if (message.modified != null) {
+           messageHtml += ' modified">' + message.text;
+         } else {
+           messageHtml += '">' + message.text;
+         }
        }
      messageHtml +=
-     '</div>';
+     '</span>';
+     if (message.modified != null) {
+       messageHtml += '<i class="message-modified-icon fas fa-pencil-alt"></i>';
+     }
+     messageHtml += '</div>';
 
      return messageHtml;
 }
@@ -95,12 +104,29 @@ function processDeletedMessages(messages) {
   });
 }
 
+function processModifiedMessages(messages) {
+  lastModifiedMessageId = messages[Object.keys(messages).length-1].id;
+  $.each(messages, function(k, message) {
+    $(".message-wrapper[data-message-id='" + message.id + "']").each(function(j, frontMessage) {
+      $(frontMessage).find('.message').text(message.text);
+      $(frontMessage).find('.message').removeClass('not-modified');
+      $(frontMessage).find('.message').addClass('modified');
+      if ($(frontMessage).find('.message-modified-icon').length == 0) {
+        $(frontMessage).append('<i class="message-modified-icon fas fa-pencil-alt"></i>');
+      }
+    });
+  });
+}
+
 function processLongPollResponse(response) {
   if (response.type == 'NEW_MESSAGES') {
     appendMessages(response.messages);
   } else if (response.type == 'NEW_DELETED_MESSAGES') {
     processDeletedMessages(response.messages);
+  } else if (response.type == 'NEW_MODIFIED_MESSAGES') {
+    processModifiedMessages(response.messages);
   }
+
 }
 
 function prependMessages(messages) {
@@ -201,8 +227,13 @@ function activateMessageMenu(message) {
 function prepareLongPollRequest() {
   var requestData = {};
   requestData['firstMessageId'] = parseInt($(".message-wrapper").first().attr("data-message-id"), 10);
-  requestData['lastMessageId'] = parseInt($(".message-wrapper").last().attr("data-message-id"), 10);
+  if ($(".message-wrapper").length == 0) {
+    requestData['lastMessageId'] = -1;
+  } else {
+    requestData['lastMessageId'] = parseInt($(".message-wrapper").last().attr("data-message-id"), 10)
+  }
   requestData['lastDeletedMessageId'] = lastDeletedMessageId;
+  requestData['lastModifiedMessageId'] = lastModifiedMessageId;
   return requestData;
 }
 
@@ -228,6 +259,14 @@ function initMessageMenuModal() {
             hostURL
     );
   });
+  $('.message-menu-modify-btn').click(function() {
+    $('#message-menu-modal').modal('hide');
+    console.log('messageMenuCurrentMessage : ' + messageMenuCurrentMessage.find('.message').text());
+    $('#modify-message-textarea').remove();
+    $('#modify-modal-content').prepend('<textarea class = "modify-message-textarea" id="modify-message-textarea">' +
+                                        messageMenuCurrentMessage.find('.message').text() + '</textarea>');
+    $('#modify-modal').modal('show');
+  });
 }
 
 $(document).ready(function() {
@@ -235,6 +274,8 @@ $(document).ready(function() {
 
    initCustomScrollbar('#messages-container');
    $('#messages-container').show();
+   initCustomScrollbar('#message-textarea');
+   $('#message-textarea').show();
    initCustomScrollbar('#message-textarea');
    $('#message-textarea').show();
    scrollToTheEnd(0);
@@ -260,6 +301,21 @@ $(document).ready(function() {
                            hostURL);
      $('.messages-to-reply').empty();
      hideMessagesToReplyBlock();
+   });
+
+   $('#modify-message-send-btn').click(function() {
+     var message = {}
+     var messageText = $('#modify-message-textarea').val();
+     if (messageText.trim() == '') {
+       return;
+     }
+     message['text'] = messageText;
+     message["id"] = parseInt(messageMenuCurrentMessage.attr("data-message-id"), 10);
+     $('#modify-message-textarea').val('');
+     sendModifiedMessage(message, function() { },
+                          function() { },
+                          function() { },
+                           hostURL);
    });
 
    $('#message-textarea').keyup(function (e) {

@@ -16,6 +16,7 @@ CREATE TABLE message (
 , datetime TIMESTAMP WITH TIME ZONE NOT NULL
 , text TEXT NOT NULL
 , deleted TIMESTAMP WITH TIME ZONE
+, modified TIMESTAMP WITH TIME ZONE
 , user_fk INTEGER REFERENCES account(user_id) -- ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -45,3 +46,4 @@ INSERT INTO role (role_id, role)
 VALUES (1, 'ADMIN'), (2, 'USER')
 ON CONFLICT (role_id) DO UPDATE
   SET role = excluded.role;
+

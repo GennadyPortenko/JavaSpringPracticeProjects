@@ -181,6 +181,7 @@ body {
   padding-right:5px;
 }
 .messages-container .message-wrapper {
+  position:relative;
   /* background:#151515; */
   text-align:left;
   padding:5px 10px 5px 0px;
@@ -203,6 +204,17 @@ body {
   line-height:27px;
   border-radius:10px;
   position:relative;
+}
+.messages-container .message.modified {
+  max-width:calc(100% - 65px);
+  margin-right:10px;
+}
+.messages-container .message-modified-icon {
+  font-size:12px;
+  position:relative;
+  width:10px;
+  margin:0;
+  padding:0;
 }
 .messages-container .message:before {
   content:"";
@@ -454,6 +466,7 @@ body {
   background:black;
   border:none !important;
 }
+
 #message-menu-modal .modal-dialog {
     -webkit-transform: translate(0,-50%);
     -o-transform: translate(0,-50%);
@@ -461,7 +474,6 @@ body {
     top: 50%;
     margin: 0 auto;
 }
-
 #info-modal .modal-dialog {
     -webkit-transform: translate(0,-50%);
     -o-transform: translate(0,-50%);
@@ -469,6 +481,14 @@ body {
     top: 50%;
     margin: 0 auto;
 }
+#modify-modal .modal-dialog {
+    -webkit-transform: translate(0,-50%);
+    -o-transform: translate(0,-50%);
+    transform: translate(0,-50%);
+    top: 50%;
+    margin: 0 auto;
+}
+
 #info-modal {
   text-align:center;
 }
@@ -512,4 +532,20 @@ body {
     margin-bottom:-12px;
   }
 }
+
+.modify-message-textarea {
+  resize:none;
+  background:black;
+  border:1px solid #666;
+  width:90%;
+  margin-left:5%;
+  color:white;
+  padding:10px 20px;;
+  font-size:12px;
+  line-height:20px;
+}
+.modify-message-textarea::-webkit-scrollbar { width: 0 !important }
+.modify-message-textarea { overflow: -moz-scrollbars-none; }
+.modify-message-textarea { -ms-overflow-style: none; }
+
 
