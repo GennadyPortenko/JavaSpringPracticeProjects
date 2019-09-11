@@ -4,7 +4,6 @@ import gpk.practice.spring.bootmvc.App;
 import gpk.practice.spring.bootmvc.configuration.AppConfig;
 import gpk.practice.spring.bootmvc.configuration.DBTestProfileConfig;
 import gpk.practice.spring.bootmvc.configuration.SecurityConfig;
-import gpk.practice.spring.bootmvc.dto.MessageDto;
 import gpk.practice.spring.bootmvc.model.Message;
 import gpk.practice.spring.bootmvc.model.User;
 import gpk.practice.spring.bootmvc.repository.MessageRepository;
@@ -23,7 +22,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static junit.framework.TestCase.assertNull;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;

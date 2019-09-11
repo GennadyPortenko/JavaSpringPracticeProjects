@@ -4,8 +4,6 @@ import gpk.practice.spring.bootmvc.App;
 import gpk.practice.spring.bootmvc.configuration.AppConfig;
 import gpk.practice.spring.bootmvc.configuration.DBTestProfileConfig;
 import gpk.practice.spring.bootmvc.configuration.SecurityConfig;
-import gpk.practice.spring.bootmvc.controller.LoginController;
-import gpk.practice.spring.bootmvc.dto.UserDto;
 import gpk.practice.spring.bootmvc.model.User;
 import gpk.practice.spring.bootmvc.service.UserService;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
@@ -19,15 +17,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.standaloneSetup;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {

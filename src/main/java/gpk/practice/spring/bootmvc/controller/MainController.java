@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -74,7 +75,8 @@ public class MainController {
         Message lastDeleted = messageRepository.findTopDeleted();
         modelMap.put("lastDeletedMessageId", lastDeleted == null ? null : lastDeleted.getMessageId());
         Message lastModified = messageRepository.findTopModified();
-        modelMap.put("lastModifiedMessageId", lastModified == null ? null : lastModified.getMessageId());
+
+        modelMap.put("lastModifiedMessageDatetime", lastModified == null ? null : lastModified.getModified() );
         return modelAndView;
     }
 
@@ -84,7 +86,7 @@ public class MainController {
         DeferredResult<ResponseEntity<?>> dr = new DeferredResult<>(LONG_POLL_TIMEOUT.longValue());
         Long clientLastMessageId = request.getLastMessageId();
         Long clientLastDeletedMessageId = request.getLastDeletedMessageId();
-        Long clientLastModifiedMessageId = request.getLastModifiedMessageId();
+        Instant clientLastModifiedMessageDatetime = request.getLastModifiedMessageDatetime();
         /* вернуть результат с более новыми сообщениями, если они есть */
         long lastMessageId = this.lastMessageId.get();
         if ( (lastMessageId != -1) && (clientLastMessageId != null)) {
@@ -99,18 +101,16 @@ public class MainController {
         /* вернуть результат с более новыми измененными сообщениями, если они есть */
         long lastModifiedMessageId = this.lastModifiedMessageId.get();
         if (lastModifiedMessageId != -1L) {
-            if ((clientLastModifiedMessageId == null) || (clientLastModifiedMessageId < 0)) {
+            if (clientLastModifiedMessageDatetime == null) {
                 List<MessageDto> newModifiedMessages = Arrays.asList(dtoService.convertToDto(messageService.findById(lastModifiedMessageId)));
+                newModifiedMessages.sort(Comparator.comparing(MessageDto::getModified));
                 dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_MODIFIED_MESSAGES, newModifiedMessages), HttpStatus.OK));
                 return dr;
             }
-            if (lastModifiedMessageId != clientLastModifiedMessageId) {
-                Instant clientLastModifiedMessageTime = messageService.findById(clientLastModifiedMessageId).getModified();
-                if (messageService.findById(lastModifiedMessageId).getModified().compareTo(clientLastModifiedMessageTime) > 0) {
-                    List<MessageDto> newModifiedMessages = messageRepository.findByModifiedGreaterThanEqual(clientLastModifiedMessageTime).stream().map(dtoService::convertToDto).collect(Collectors.toList());
-                    dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_MODIFIED_MESSAGES, newModifiedMessages), HttpStatus.OK));
-                    return dr;
-                }
+            if (messageService.findById(lastModifiedMessageId).getModified().compareTo(clientLastModifiedMessageDatetime) > 0) {
+                List<MessageDto> newModifiedMessages = messageRepository.findByModifiedGreaterThanEqual(clientLastModifiedMessageDatetime).stream().map(dtoService::convertToDto).collect(Collectors.toList());
+                dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_MODIFIED_MESSAGES, newModifiedMessages), HttpStatus.OK));
+                return dr;
             }
         }
         /* вернуть результат с более новыми удаленными сообщениями, если они есть */
@@ -125,6 +125,8 @@ public class MainController {
                 Instant clientLastDeletedMessageTime = messageService.findById(clientLastDeletedMessageId).getDeleted();
                 if (messageService.findById(lastDeletedMessageId).getDeleted().compareTo(clientLastDeletedMessageTime) > 0) {
                     List<MessageDto> newDeletedMessages = messageRepository.findByDeletedGreaterThanEqual(clientLastDeletedMessageTime).stream().map(dtoService::convertToDto).collect(Collectors.toList());
+                    // newDeletedMessages.sort((m1, m2) -> { return m2.getDeleted(). - m1.getDeleted() });
+                    newDeletedMessages.sort(Comparator.comparing(MessageDto::getDeleted));
                     dr.setResult(new ResponseEntity<>(new LongPollResponse(LongPollResponseType.NEW_DELETED_MESSAGES, newDeletedMessages), HttpStatus.OK));
                     return dr;
                 }

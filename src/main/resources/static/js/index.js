@@ -100,19 +100,22 @@ function processDeletedMessages(messages) {
       $(frontMessage).find('.message').text('сообщение удалено');
       $(frontMessage).find('.message').addClass('message-deleted');
       $(frontMessage).find(".msg-menu-btn").remove();
+      $(frontMessage).find('.message-modified-icon').remove();
     });
   });
 }
 
 function processModifiedMessages(messages) {
-  lastModifiedMessageId = messages[Object.keys(messages).length-1].id;
+  lastModifiedMessageDatetime = messages[Object.keys(messages).length-1].modified;
   $.each(messages, function(k, message) {
     $(".message-wrapper[data-message-id='" + message.id + "']").each(function(j, frontMessage) {
-      $(frontMessage).find('.message').text(message.text);
-      $(frontMessage).find('.message').removeClass('not-modified');
-      $(frontMessage).find('.message').addClass('modified');
-      if ($(frontMessage).find('.message-modified-icon').length == 0) {
-        $(frontMessage).append('<i class="message-modified-icon fas fa-pencil-alt"></i>');
+      if (message.deleted == null) {
+        $(frontMessage).find('.message').text(message.text);
+        $(frontMessage).find('.message').removeClass('not-modified');
+        $(frontMessage).find('.message').addClass('modified');
+        if ($(frontMessage).find('.message-modified-icon').length == 0) {
+          $(frontMessage).append('<i class="message-modified-icon fas fa-pencil-alt"></i>');
+        }
       }
     });
   });
@@ -233,7 +236,7 @@ function prepareLongPollRequest() {
     requestData['lastMessageId'] = parseInt($(".message-wrapper").last().attr("data-message-id"), 10)
   }
   requestData['lastDeletedMessageId'] = lastDeletedMessageId;
-  requestData['lastModifiedMessageId'] = lastModifiedMessageId;
+  requestData['lastModifiedMessageDatetime'] = lastModifiedMessageDatetime;
   return requestData;
 }
 
@@ -310,7 +313,8 @@ $(document).ready(function() {
        return;
      }
      message['text'] = messageText;
-     message["id"] = parseInt(messageMenuCurrentMessage.attr("data-message-id"), 10);
+     message['id'] = parseInt(messageMenuCurrentMessage.attr('data-message-id'), 10);
+     message['modified'] = messageMenuCurrentMessage.attr('data-message-modified');
      $('#modify-message-textarea').val('');
      sendModifiedMessage(message, function() { },
                           function() { },

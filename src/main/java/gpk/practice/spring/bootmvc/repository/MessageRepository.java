@@ -16,6 +16,7 @@ public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpec
     Message findById(long id);
     Message findByText(String text);
     Set<Message> findByUser(User user);
+    Message findByModified(Instant modified);
 
     List<Message> findTop20ByOrderByMessageIdDesc();
     List<Message> findTop20ByMessageIdLessThanOrderByMessageIdDesc(long id);
