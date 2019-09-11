@@ -1,6 +1,5 @@
 package gpk.practice.spring.bootmvc.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.DynamicUpdate;

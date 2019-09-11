@@ -1,6 +1,5 @@
 package gpk.practice.spring.bootmvc.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
