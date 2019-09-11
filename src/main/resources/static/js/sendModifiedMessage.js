@@ -1,5 +1,5 @@
 function sendModifiedMessage(requestData, onSuccess, onError, onNocontent, hostURL) {
-  console.log("sending message : '" + requestData["text"] + "'");
+  console.log("sending message modify request: '" + requestData["text"] + "'");
   $.ajax({
     type: "POST",
     contentType: "application/json",

@@ -23,5 +23,5 @@ public class LongPollRequest {
     Long lastDeletedMessageId;
     @Getter
     @Setter
-    Long lastModifiedMessageId;
+    Instant lastModifiedMessageDatetime;
 }

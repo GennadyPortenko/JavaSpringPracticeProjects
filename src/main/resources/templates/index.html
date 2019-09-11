@@ -24,7 +24,7 @@
       /*<![CDATA[*/
         var current_username_ = /*[[${session.username}]]*/ null;
         var lastDeletedMessageId = /*[[${lastDeletedMessageId}]]*/ null;
-        var lastModifiedMessageId = /*[[${lastModifiedMessageId}]]*/ null;
+        var lastModifiedMessageDatetime = /*[[${lastModifiedMessageDatetime}]]*/ null;
       /*]]>*/
     </script>
 </head>
@@ -39,7 +39,7 @@
                     class="load-previous-messages-btn" id="load-previous-messages-btn">загрузить еще</button>
             <div th:classappend="${#arrays.length(messages)} != 0 ? hidden : visible"
                  class="no-more-messages-label" id="no-messages-yet">сообщений пока нет</div>
-            <div th:each="message: ${messages}" th:attr = "data-message-id = ${message.id}" class="message-wrapper message-wrapper-left"
+            <div th:each="message: ${messages}" th:attr="data-message-modified = ${message.modified}, data-message-id = ${message.id}" class="message-wrapper message-wrapper-left"
                  th:classappend="${message.username} != ${session.username} ? message-wrapper-notme : message-wrapper-me">
                 <div class="message-bar">
                     <span th:text="${message.username}" class="username"></span>
